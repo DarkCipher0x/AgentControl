@@ -1,0 +1,67 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.DownloadsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <DockPanel Margin="{DynamicResource PageMargin}">
+        <DockPanel DockPanel.Dock="Top">
+            <WrapPanel DockPanel.Dock="Right" VerticalAlignment="Top" MaxWidth="620" HorizontalAlignment="Right">
+                <Button Content="Pause" Command="{Binding PauseCommand}" ToolTip="Only for downloads that can resume (Ollama keeps finished layers)."/>
+                <Button Content="Resume" Command="{Binding ResumeCommand}"/>
+                <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+                <Button Content="Retry" Command="{Binding RetryCommand}"/>
+                <Button Content="Repair…" Command="{Binding RepairCommand}" ToolTip="Opens the catalogue or Models page, where repair diagnoses first."/>
+                <Button Content="Details / log" Command="{Binding DetailsCommand}"/>
+                <Button Content="Remove entry" Command="{Binding RemoveCommand}" ToolTip="Removes the finished entry from this list. Nothing is uninstalled."/>
+                <Button Content="Clear finished" Command="{Binding ClearCommand}"/>
+            </WrapPanel>
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        </DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8"
+                   Text="Stages: Queued → Resolving → Downloading → Verifying → Installing → Testing → Ready / Ready with limitations / Failed / Cancelled / Rollback required. History survives restarts; anything interrupted by closing the app is marked Interrupted and is never resumed silently."/>
+        <TextBlock DockPanel.Dock="Top" Text="Nothing has been queued yet. Models are pulled from the Models page; tools are installed from the Catalogue." Style="{StaticResource EmptyState}"
+                   Visibility="{Binding Jobs.Count, Converter={StaticResource ZeroToVisible}}"/>
+        <ListBox ItemsSource="{Binding Jobs}" SelectedItem="{Binding Selected}" shell:ContextMenus.Provider="{Binding}" AutomationProperties.Name="Download and installation queue"
+                 VirtualizingPanel.IsVirtualizing="True" HorizontalContentAlignment="Stretch">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="0,6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="220"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Request.DisplayName}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}"/>
+                                <Border Style="{StaticResource Badge}" Margin="8,0,0,0"><TextBlock Text="{Binding TypeLabel}" FontSize="{DynamicResource FsCaption}" Foreground="{DynamicResource Muted}"/></Border>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource Caption}">
+                                <Run Text="{Binding Request.Source, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Request.VersionOrTag, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Request.Target, Mode=OneWay}" FontFamily="{DynamicResource MonoFont}"/>
+                            </TextBlock>
+                            <ProgressBar Value="{Binding Percent, Mode=OneWay}" Maximum="100" IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}" Margin="0,6,0,4"
+                                         AutomationProperties.Name="{Binding Request.DisplayName, StringFormat=Progress of {0}}"/>
+                            <TextBlock Style="{StaticResource BodySecondary}">
+                                <Run Text="{Binding Status, Mode=OneWay}"/><Run Text="  ·  "/>
+                                <Run Text="{Binding BytesDone, Mode=OneWay, Converter={StaticResource Bytes}}"/><Run Text=" of "/>
+                                <Run Text="{Binding BytesTotal, Mode=OneWay, Converter={StaticResource Bytes}}"/><Run Text="  ·  "/>
+                                <Run Text="{Binding SpeedText, Mode=OneWay}"/><Run Text="  ·  ETA "/>
+                                <Run Text="{Binding Eta, Mode=OneWay, StringFormat=hh\\:mm\\:ss}"/>
+                            </TextBlock>
+                            <TextBlock Text="{Binding VerificationResult, StringFormat=Verification: {0}}" Style="{StaticResource BodySecondary}"
+                                       Visibility="{Binding VerificationResult, Converter={StaticResource NullToCollapsed}}"/>
+                            <TextBlock Text="{Binding FinalLocation, StringFormat=Location: {0}}" Style="{StaticResource Code}" Foreground="{DynamicResource Muted}"
+                                       Visibility="{Binding FinalLocation, Converter={StaticResource NullToCollapsed}}"/>
+                            <TextBlock Text="{Binding Error}" Foreground="{DynamicResource Bad}" TextWrapping="Wrap" Visibility="{Binding Error, Converter={StaticResource NullToCollapsed}}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="12,0,0,0">
+                            <TextBlock Text="STAGE" Style="{StaticResource Label}"/>
+                            <TextBlock Text="{Binding StageLabel}" Foreground="{DynamicResource Accent}" FontWeight="SemiBold"/>
+                            <TextBlock Text="INSTALLATION" Style="{StaticResource Label}" Margin="0,6,0,4"/>
+                            <TextBlock Text="{Binding InstallState}" Style="{StaticResource Body}"/>
+                        </StackPanel>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</UserControl>

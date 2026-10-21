@@ -1,0 +1,218 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <UserControl.Resources>
+        <!-- Card bodies by id. Order, size and visibility come from the saved layout (Customise bar or Settings → Dashboard). -->
+        <DataTemplate x:Key="hardware">
+            <StackPanel>
+                <TextBlock Text="THIS PC" Style="{StaticResource Label}"/>
+                <TextBlock Text="{Binding Owner.HardwareHeadline}" Style="{StaticResource Value}"/>
+                <TextBlock Text="{Binding Owner.HardwareDetail}" Style="{StaticResource MutedText}" Margin="0,4,0,0"
+                           Visibility="{Binding Owner.ShowHardwareDetails, Converter={StaticResource BoolToVis}}"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="runtime">
+            <StackPanel>
+                <TextBlock Text="RUNTIME" Style="{StaticResource Label}"/>
+                <StackPanel Orientation="Horizontal">
+                    <Ellipse Width="9" Height="9" Fill="{Binding Owner.RuntimeBrush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{Binding Owner.RuntimeSummary}" Style="{StaticResource Body}" MaxWidth="320"/>
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="activity">
+            <StackPanel>
+                <TextBlock Text="ACTIVITY" Style="{StaticResource Label}"/>
+                <TextBlock Text="{Binding Owner.SessionSummary}" Style="{StaticResource Body}"/>
+                <TextBlock Text="{Binding Owner.SecuritySummary}" Style="{StaticResource MutedText}" Margin="0,6,0,0"/>
+                <Button Content="Sessions →" Style="{StaticResource LinkButton}" Command="{Binding Owner.GoSessionsCommand}" Margin="0,8,0,0" HorizontalAlignment="Left"/>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="stacks">
+            <StackPanel>
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Content="{Binding Owner.FilterLabel}" Style="{StaticResource LinkButton}" Command="{Binding Owner.ToggleAttentionFilterCommand}" Margin="0,0,14,0"/>
+                        <Button Content="Manage stacks →" Style="{StaticResource LinkButton}" Command="{Binding Owner.GoStacksCommand}"/>
+                    </StackPanel>
+                    <TextBlock Text="Stack readiness" Style="{StaticResource CardTitle}"/>
+                </DockPanel>
+                <TextBlock Text="Nothing to show with this filter." Style="{StaticResource EmptyState}"
+                           Visibility="{Binding Owner.Stacks.Count, Converter={StaticResource ZeroToVisible}}"/>
+                <ItemsControl ItemsSource="{Binding Owner.Stacks}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,7">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                        <Ellipse Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Status}" Foreground="{Binding Brush}" FontSize="{DynamicResource FsBody}"/>
+                                    </StackPanel>
+                                    <TextBlock Grid.Column="2" Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="agents">
+            <StackPanel>
+                <TextBlock Text="Agents" Style="{StaticResource CardTitle}"/>
+                <ItemsControl ItemsSource="{Binding Owner.Agents}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,4">
+                                <Ellipse DockPanel.Dock="Left" Width="8" Height="8" Fill="{Binding Brush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" Width="130" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="loaded-models">
+            <StackPanel>
+                <TextBlock Text="Loaded models" Style="{StaticResource CardTitle}"/>
+                <TextBlock Text="Nothing is loaded in memory right now." Style="{StaticResource EmptyState}"
+                           Visibility="{Binding Owner.LoadedModels.Count, Converter={StaticResource ZeroToVisible}}"/>
+                <ItemsControl ItemsSource="{Binding Owner.LoadedModels}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,4">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Status}" Foreground="{Binding Brush}" FontSize="{DynamicResource FsBody}"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" Style="{StaticResource Mono}" Width="220"/>
+                                <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="downloads">
+            <StackPanel>
+                <DockPanel>
+                    <Button DockPanel.Dock="Right" Content="Downloads →" Style="{StaticResource LinkButton}" Command="{Binding Owner.GoDownloadsCommand}"/>
+                    <TextBlock Text="Downloads and installs" Style="{StaticResource CardTitle}"/>
+                </DockPanel>
+                <TextBlock Text="Nothing queued." Style="{StaticResource EmptyState}" Visibility="{Binding Owner.DownloadRows.Count, Converter={StaticResource ZeroToVisible}}"/>
+                <ItemsControl ItemsSource="{Binding Owner.DownloadRows}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,3">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Status}" Foreground="{Binding Brush}" FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource Body}"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="verified">
+            <StackPanel>
+                <TextBlock Text="Verified configurations" Style="{StaticResource CardTitle}"/>
+                <TextBlock Text="No configuration has passed end-to-end verification on this PC yet. Use Stacks → Run full verification." Style="{StaticResource EmptyState}"
+                           Visibility="{Binding Owner.VerifiedRows.Count, Converter={StaticResource ZeroToVisible}}"/>
+                <ItemsControl ItemsSource="{Binding Owner.VerifiedRows}" Focusable="False">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,3">
+                                <TextBlock DockPanel.Dock="Right" Text="{Binding Detail}" Style="{StaticResource Caption}"/>
+                                <TextBlock Text="{Binding Name}" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </DataTemplate>
+
+        <shell:CardBodySelector x:Key="CardBodySelector"/>
+        <!-- Card frame: the body above plus the edit bar shown while customising. -->
+        <DataTemplate x:Key="CardFrame">
+            <Border Style="{StaticResource Card}" AutomationProperties.Name="{Binding Title}">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,-6,0,4"
+                                Visibility="{Binding Owner.Customising, Converter={StaticResource BoolToVis}}">
+                        <Button Content="↑" Style="{StaticResource SmallButton}" ToolTip="Move earlier" AutomationProperties.Name="{Binding Title, StringFormat=Move {0} earlier}"
+                                Command="{Binding Owner.MoveUpCommand}" CommandParameter="{Binding Id}"/>
+                        <Button Content="↓" Style="{StaticResource SmallButton}" ToolTip="Move later" AutomationProperties.Name="{Binding Title, StringFormat=Move {0} later}"
+                                Command="{Binding Owner.MoveDownCommand}" CommandParameter="{Binding Id}"/>
+                        <Button Content="Wide / normal" Style="{StaticResource SmallButton}" Visibility="{Binding CanBeWide, Converter={StaticResource BoolToVis}}"
+                                Command="{Binding Owner.ToggleWideCommand}" CommandParameter="{Binding Id}"/>
+                        <Button Content="Hide" Style="{StaticResource SmallButton}" Command="{Binding Owner.HideCommand}" CommandParameter="{Binding Id}"
+                                AutomationProperties.Name="{Binding Title, StringFormat=Hide {0}}"/>
+                    </StackPanel>
+                    <ContentPresenter Content="{Binding}" ContentTemplateSelector="{StaticResource CardBodySelector}"/>
+                </DockPanel>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="{DynamicResource PageMargin}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                    <ItemsControl ItemsSource="{Binding QuickActions}" Focusable="False">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid>
+                                    <Button Content="{Binding Title}" Command="{Binding Command}" Style="{StaticResource PrimaryButton}" Visibility="{Binding Primary, Converter={StaticResource BoolToVis}}"/>
+                                    <Button Content="{Binding Title}" Command="{Binding Command}" Visibility="{Binding Primary, Converter={StaticResource BoolToVisInverted}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Content="Refresh" Command="{Binding RefreshCommand}"/>
+                    <Button Content="Customise" Command="{Binding ToggleCustomiseCommand}" ToolTip="Reorder, resize, hide or add dashboard cards."/>
+                </StackPanel>
+                <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+            </DockPanel>
+
+            <!-- Customise bar -->
+            <Border Style="{StaticResource Notice}" BorderBrush="{DynamicResource Accent}" Visibility="{Binding Customising, Converter={StaticResource BoolToVis}}">
+                <StackPanel>
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                            <Button Content="{Binding ModeLabel}" Style="{StaticResource SmallButton}" Command="{Binding ToggleModeCommand}"/>
+                            <Button Content="Reset layout" Style="{StaticResource SmallButton}" Command="{Binding ResetLayoutCommand}"/>
+                            <Button Content="Done" Style="{StaticResource SmallButton}" Command="{Binding ToggleCustomiseCommand}"/>
+                        </StackPanel>
+                        <TextBlock Text="Customise the dashboard with the buttons on each card. Changes are saved immediately." Style="{StaticResource Body}"/>
+                    </DockPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <TextBlock Text="Hidden cards:" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ItemsControl ItemsSource="{Binding HiddenCards}" Focusable="False">
+                            <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Content="{Binding Title, StringFormat=+ {0}}" Style="{StaticResource SmallButton}" Command="{Binding Owner.ShowCommand}" CommandParameter="{Binding Id}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource CardFrame}" Focusable="False">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate><shell:CardPanel Columns="{Binding DataContext.Columns, RelativeSource={RelativeSource AncestorType=UserControl}}"/></ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="shell:CardPanel.IsWide" Value="{Binding IsWide}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+            </ItemsControl>
+            <TextBlock Text="{Binding Message}" Style="{StaticResource MutedText}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

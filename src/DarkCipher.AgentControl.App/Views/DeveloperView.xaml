@@ -1,0 +1,46 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.DeveloperView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,18,12,18">
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+            <UniformGrid Columns="2">
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="SDK" Style="{StaticResource Label}"/>
+                        <TextBlock Style="{StaticResource Value}"><Run Text="DarkCipher.AgentControl.Sdk "/><Run Text="{Binding SdkVersion, Mode=OneWay}"/></TextBlock>
+                        <TextBlock Style="{StaticResource MutedText}" Margin="0,6,0,0" Text="Semantic versioning. Extensions built for SDK 1.x load on any host with SDK 1.y where y ≥ x. Extensions may reference only the SDK — never application internals (enforced by the loader)."/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="DEVELOPMENT MODE" Style="{StaticResource Label}"/>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="ON — code extensions load without isolation" Foreground="{DynamicResource Warn}" FontWeight="SemiBold" Visibility="{Binding DevelopmentMode, Converter={StaticResource BoolToVis}}"/>
+                            <TextBlock Text="Off" Foreground="{DynamicResource Good}" FontWeight="SemiBold" Visibility="{Binding DevelopmentMode, Converter={StaticResource BoolToVisInverted}}"/>
+                        </StackPanel>
+                        <Button Content="Toggle Development Mode…" Command="{Binding ToggleDevModeCommand}" HorizontalAlignment="Left" Margin="0,10,0,0"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Tooling" Style="{StaticResource H2}"/>
+                    <ItemsControl ItemsSource="{Binding Tooling}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource Mono}" Margin="0,3"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Validate folder…" Command="{Binding ValidateCommand}"/>
+                        <TextBlock Text="Manifest validator" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Validation}" Style="{StaticResource Mono}"/>
+                </StackPanel>
+            </Border>
+            <TextBlock Text="{Binding Message}" Style="{StaticResource MutedText}"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,49 @@
+# Every file that may be published (the public repository, the source zip, everything the website takes from it).
+# One pattern per line, relative to the project root, '/' separators: '*' matches within a folder, '**' any folders.
+# A file that matches no line here and no line in private-list.txt stops the build ("classify this file"), so nothing
+# is ever published or dropped without a decision. Build output (bin, obj, dist, publish, .vs) is never considered.
+.config/dotnet-tools.json
+.gitignore
+CHANGELOG.md
+DarkCipherAgentControl.sln
+Directory.Build.props
+global.json
+nuget.config
+LICENSE
+README.md
+build.ps1
+release.ps1
+docs/*.md
+docs/adr/*.md
+docs/release-notes/*.md
+docs/sdk/*.md
+installer/*.wxs
+schemas/*.json
+samples/*/*.cs
+samples/*/*.csproj
+samples/*/extension.json
+samples/*/packages.lock.json
+samples/*/catalogs/*.json
+samples/*/templates/*.json
+src/*/**/*.cs
+src/*/*.csproj
+src/*/packages.lock.json
+src/*/**/*.xaml
+src/*/app.manifest
+src/DarkCipher.AgentControl.App/Assets/AppIcon/*
+src/DarkCipher.AgentControl.App/Gallery/*/extension.json
+src/DarkCipher.AgentControl.App/Gallery/*/catalogs/*.json
+src/DarkCipher.AgentControl.App/Gallery/*/templates/*.json
+tests/*/**/*.cs
+tests/*/*.csproj
+tests/*/packages.lock.json
+tools/*.ps1
+tools/release/*.ps1
+tools/release-config.json
+tools/public-allowlist.txt
+tools/private-list.txt
+tools/approved-images.txt
+tools/gitleaks.toml
+tools/DarkCipher.AgentControl.*/*.cs
+tools/DarkCipher.AgentControl.*/*.csproj
+tools/DarkCipher.AgentControl.*/packages.lock.json

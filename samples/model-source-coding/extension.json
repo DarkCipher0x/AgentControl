@@ -1,0 +1,20 @@
+{
+  "id": "com.example.coding-catalog",
+  "name": "Coding model catalogue",
+  "publisher": "Example Labs",
+  "version": "1.0.0",
+  "description": "Declarative sample: a curated list of coding models (metadata only; nothing is downloaded by the extension).",
+  "minAppVersion": "0.1.0",
+  "maxTestedVersion": "0.1.0",
+  "sdkVersion": "1.0.0",
+  "entryPoint": null,
+  "types": ["ModelSource"],
+  "permissions": [],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "CC0-1.0",
+  "source": null,
+  "signature": null,
+  "contributes": { "stackTemplates": [], "modelCatalogs": ["catalogs/coding-models.json"] }
+}

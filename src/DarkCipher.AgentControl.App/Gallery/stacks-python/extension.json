@@ -1,0 +1,20 @@
+{
+  "id": "darkcipher.gallery.stacks-python",
+  "name": "Python stacks",
+  "publisher": "DarkCipher Systems",
+  "version": "1.0.0",
+  "description": "Data only: Codex + Ollama stacks tuned for Python projects (a balanced coding stack and a read-only review stack). Runs no code.",
+  "minAppVersion": "0.1.9",
+  "maxTestedVersion": "0.1.9",
+  "sdkVersion": "1.1.0",
+  "entryPoint": null,
+  "types": ["StackTemplate"],
+  "permissions": [],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "MIT",
+  "source": null,
+  "signature": null,
+  "contributes": { "stackTemplates": ["templates/stacks.json"], "modelCatalogs": [] }
+}

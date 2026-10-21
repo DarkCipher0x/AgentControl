@@ -1,0 +1,85 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.ExtensionsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <DockPanel Margin="24,18,24,18">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="Install from file…" Command="{Binding InstallCommand}"/>
+                <Button Content="Enable" Command="{Binding EnableCommand}"/>
+                <Button Content="Disable" Command="{Binding DisableCommand}"/>
+                <Button Content="Remove" Style="{StaticResource DangerButton}" Command="{Binding RemoveCommand}"/>
+            </StackPanel>
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        </DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <Border DockPanel.Dock="Top" Style="{StaticResource Notice}" BorderBrush="{DynamicResource AccentDim}">
+            <TextBlock Text="{Binding PolicyNote}" Style="{StaticResource Body}"/>
+        </Border>
+        <TabControl>
+            <TabItem Header="Gallery">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Text="{Binding GalleryNote}" Style="{StaticResource MutedText}" Margin="0,0,0,8"/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Gallery}" Focusable="False" shell:ContextMenus.Provider="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Card}" Margin="0,0,0,8">
+                                        <DockPanel>
+                                            <StackPanel DockPanel.Dock="Right" Width="150" Margin="12,0,0,0" VerticalAlignment="Center">
+                                                <Button Content="Install…" Style="{StaticResource PrimaryButton}" Margin="0,0,0,6"
+                                                        Command="{Binding DataContext.InstallGalleryCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                        Visibility="{Binding CanInstall, Converter={StaticResource BoolToVis}}" AutomationProperties.Name="{Binding Name, StringFormat=Install {0}}"/>
+                                                <Button Content="Details" Command="{Binding DataContext.GalleryDetailsCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                            <StackPanel>
+                                                <WrapPanel>
+                                                    <TextBlock Text="{Binding Name}" Style="{StaticResource CardTitle}" Margin="0,0,10,4"/>
+                                                    <Border Style="{StaticResource Badge}"><TextBlock Text="{Binding State}" Foreground="{DynamicResource Accent}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/></Border>
+                                                    <Border Style="{StaticResource Badge}"><TextBlock Text="{Binding Kind}" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                                    <Border Style="{StaticResource Badge}"><TextBlock Text="Data only" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                                </WrapPanel>
+                                                <TextBlock Text="{Binding Description}" Style="{StaticResource Body}"/>
+                                                <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0"><Run Text="{Binding Id, Mode=OneWay}"/><Run Text="  ·  version "/><Run Text="{Binding Version, Mode=OneWay}"/><Run Text="  ·  DarkCipher Systems  ·  MIT"/></TextBlock>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Installed">
+                <DataGrid ItemsSource="{Binding Extensions}" SelectedItem="{Binding Selected}" shell:ContextMenus.Provider="{Binding}">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="NAME" Binding="{Binding Name}" Width="220"/>
+                        <DataGridTextColumn Header="VERSION" Binding="{Binding Version}" Width="70"/>
+                        <DataGridTextColumn Header="PUBLISHER" Binding="{Binding Publisher}" Width="140"/>
+                        <DataGridTextColumn Header="TRUST" Binding="{Binding Trust}" Width="90"/>
+                        <DataGridTextColumn Header="STATE" Binding="{Binding State}" Width="90"/>
+                        <DataGridTextColumn Header="ISOLATION" Binding="{Binding Isolation}" Width="230"/>
+                        <DataGridTextColumn Header="REASON" Binding="{Binding StateReason}" Width="*">
+                            <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style></DataGridTextColumn.ElementStyle>
+                        </DataGridTextColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem Header="Commands and panels">
+                <DockPanel>
+                    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+                        <Button DockPanel.Dock="Right" Content="Run" Command="{Binding RunCommand}"/>
+                        <TextBlock Text="Contributed commands and panels" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Contributions}" SelectedItem="{Binding SelectedContribution}" shell:ContextMenus.Provider="{Binding}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="EXTENSION" Binding="{Binding ExtensionId}" Width="260"/>
+                            <DataGridTextColumn Header="KIND" Binding="{Binding Kind}" Width="140"/>
+                            <DataGridTextColumn Header="TITLE" Binding="{Binding Title}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

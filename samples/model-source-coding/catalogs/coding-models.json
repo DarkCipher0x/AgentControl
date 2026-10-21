@@ -1,0 +1,5 @@
+{ "models": [
+  { "ollamaName": "qwen2.5-coder:7b", "role": "FastUtility", "notes": "Quick edits and completions." },
+  { "ollamaName": "qwen2.5-coder:14b", "role": "PrimaryCoding", "notes": "12-16 GB GPUs." },
+  { "ollamaName": "devstral:24b", "role": "PrimaryCoding", "notes": "Agentic software engineering." }
+] }

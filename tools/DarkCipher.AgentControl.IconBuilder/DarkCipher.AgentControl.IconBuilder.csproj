@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Renders the application icon set from one geometry definition (IconArt.cs): SVG master, PNGs, multi-frame ICO.
+       Run on demand:  tools\build-icons.ps1 (dotnet run with the App's Assets\AppIcon folder as the argument)
+       Not part of the solution build; the generated assets are checked in and verified by tests. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <AssemblyName>dcac-iconbuilder</AssemblyName>
+  </PropertyGroup>
+</Project>

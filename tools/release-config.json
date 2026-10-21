@@ -1,0 +1,13 @@
+{
+  "_comment": "AgentControl release pipeline settings (release.ps1, docs/RELEASE.md). Public steps can be stopped at any time with the DCX_PUBLISH_OFF=1 environment variable.",
+  "app": "AgentControl",
+  "appKey": "agentcontrol",
+  "publicRemote": "https://github.com/DarkCipher0x/AgentControl.git",
+  "publicRepoApi": "https://api.github.com/repos/DarkCipher0x/AgentControl",
+  "publicClone": "../AgentControl-public",
+  "privateRemote": "https://github.com/DarkCipher0x/AgentControl-private.git",
+  "branch": "main",
+  "website": true,
+  "discord": true,
+  "discordChannel": "agentcontrol"
+}

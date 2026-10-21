@@ -1,0 +1,20 @@
+{
+  "id": "darkcipher.gallery.stacks-small-gpu",
+  "name": "Stacks for 8 GB GPUs and laptops",
+  "publisher": "DarkCipher Systems",
+  "version": "1.0.0",
+  "description": "Data only: Codex + Ollama stacks with small models that fit an 8 GB GPU or run on a laptop CPU. Runs no code.",
+  "minAppVersion": "0.1.9",
+  "maxTestedVersion": "0.1.9",
+  "sdkVersion": "1.1.0",
+  "entryPoint": null,
+  "types": ["StackTemplate"],
+  "permissions": [],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "MIT",
+  "source": null,
+  "signature": null,
+  "contributes": { "stackTemplates": ["templates/stacks.json"], "modelCatalogs": [] }
+}

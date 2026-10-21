@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  DarkCipher AgentControl - per-machine MSI (WiX 5), same layout as the other DarkCipher Systems apps.
+  * Installs to C:\Program Files\DarkCipher Systems\AgentControl. Windows asks for administrator approval once during
+    the install; the app itself always runs unelevated. No services, no firewall rules, one HKLM value, no system settings.
+  * Uninstall removes the program only. User data (%LOCALAPPDATA%\DarkCipher\AgentControl) and credentials in Windows
+    Credential Manager are kept; see docs/RECOVERY.md to remove them.
+  * UNSIGNED: no code-signing certificate exists, so Windows SmartScreen will warn.
+  * UpgradeCode is fixed forever; never change it.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="DarkCipher AgentControl" Manufacturer="DarkCipher Systems" Version="$(var.Version)"
+           UpgradeCode="6372AF2E-C0F4-488C-AB28-82C6E48DC385" Scope="perMachine" Compressed="yes" Language="1033">
+    <SummaryInformation Description="DarkCipher AgentControl $(var.Version)" Manufacturer="DarkCipher Systems" />
+    <MajorUpgrade DowngradeErrorMessage="A newer version of DarkCipher AgentControl is already installed." AllowSameVersionUpgrades="no" />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Application icon (tools/DarkCipher.AgentControl.IconBuilder): Add/Remove Programs entry and Start-menu shortcuts. -->
+    <Icon Id="AppIcon.ico" SourceFile="$(var.IconFile)" />
+    <Property Id="ARPPRODUCTICON" Value="AppIcon.ico" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="CompanyFolder" Name="DarkCipher Systems">
+        <Directory Id="INSTALLFOLDER" Name="AgentControl" />
+      </Directory>
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="AppMenuFolder" Name="DarkCipher Systems">
+        <Component Id="StartMenuShortcuts" Guid="9D3B0E64-6C2F-4B57-9C9E-2F6A7B1C5E10">
+          <Shortcut Id="AppShortcut" Name="DarkCipher AgentControl" Description="Agentic AI control plane"
+                    Target="[INSTALLFOLDER]DarkCipherAgentControl.exe" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon.ico" />
+          <Shortcut Id="SafeModeShortcut" Name="DarkCipher AgentControl (Safe Mode)" Description="Start with built-in components only"
+                    Target="[INSTALLFOLDER]DarkCipherAgentControl.exe" Arguments="--safe-mode" WorkingDirectory="INSTALLFOLDER" Icon="AppIcon.ico" />
+          <RemoveFolder Id="RemoveAppMenuFolder" On="uninstall" />
+          <RegistryValue Root="HKLM" Key="Software\DarkCipher Systems\AgentControl" Name="StartMenu" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+      </Directory>
+    </StandardDirectory>
+
+    <Feature Id="Main" Title="DarkCipher AgentControl">
+      <!-- WiX 5 file harvesting: every file of the self-contained publish folder, one component each. -->
+      <Files Directory="INSTALLFOLDER" Include="$(var.PublishDir)\**" />
+      <ComponentRef Id="StartMenuShortcuts" />
+    </Feature>
+  </Package>
+</Wix>

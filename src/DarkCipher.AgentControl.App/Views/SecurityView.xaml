@@ -1,0 +1,112 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.SecurityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <DockPanel Margin="24,18,24,18">
+        <ContentPresenter DockPanel.Dock="Top" Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <TabControl>
+            <TabItem Header="Policy">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="PRIVACY MODE" Style="{StaticResource Label}"/>
+                                <ComboBox ItemsSource="{Binding PrivacyModes}" SelectedItem="{Binding Privacy}" Width="240" HorizontalAlignment="Left"/>
+                                <TextBlock Style="{StaticResource MutedText}" Margin="0,6,0,0" Text="Fully Local: inference only on this PC or approved local-network endpoints; no cloud, no fallback. Local Preferred: cloud inference blocked. Hybrid: cloud stacks allowed when you choose them. Cloud Allowed: no restriction beyond endpoint approval. Enforced by the network service and the session launcher."/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <CheckBox Content="Disable third-party extensions (built-in components only)" IsChecked="{Binding DisableThirdParty}"/>
+                                <CheckBox Content="Allow remote runtimes (each endpoint still needs approval)" IsChecked="{Binding AllowRemoteRuntimes}"/>
+                                <TextBlock Text="Safe Mode is ON for this session (started with --safe-mode)." Foreground="{DynamicResource Warn}" Margin="0,8,0,0" Visibility="{Binding SafeMode, Converter={StaticResource BoolToVis}}"/>
+                                <TextBlock Style="{StaticResource MutedText}" Margin="0,8,0,0" Text="Start the app with --safe-mode to skip all third-party extensions for one session."/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <TabItem Header="Network">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="Approve endpoint…" Command="{Binding AddEndpointCommand}"/>
+                        <Button Content="Revoke" Style="{StaticResource DangerButton}" Command="{Binding RevokeEndpointCommand}"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Loopback (this PC) is always allowed. Everything else is classified (Local Network / Private Remote / Public Internet / Unknown — Unknown is never treated as local) and refused until approved. HTTPS is required except for approved local-network addresses; certificates are always validated; redirects cannot downgrade to HTTP; credentials are never forwarded to another host."/>
+                    <ListBox ItemsSource="{Binding Endpoints}" SelectedItem="{Binding SelectedEndpoint}"/>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Protected folders">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Style="{StaticResource Card}" Margin="0,0,0,10">
+                        <StackPanel>
+                            <WrapPanel>
+                                <CheckBox Content="Block all access" IsChecked="{Binding RuleBlockAll}" Margin="0,0,14,0"/>
+                                <CheckBox Content="Read only" IsChecked="{Binding RuleReadOnly}" Margin="0,0,14,0"/>
+                                <CheckBox Content="Ask before writes" IsChecked="{Binding RuleAskWrites}" Margin="0,0,14,0"/>
+                                <CheckBox Content="Ask before deletion" IsChecked="{Binding RuleAskDelete}" Margin="0,0,14,0"/>
+                                <CheckBox Content="No process execution" IsChecked="{Binding RuleNoExec}" Margin="0,0,14,0"/>
+                                <CheckBox Content="No extension access" IsChecked="{Binding RuleNoAddOn}" Margin="0,0,14,0"/>
+                            </WrapPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                <Button Content="Protect a folder…" Style="{StaticResource PrimaryButton}" Command="{Binding AddPathCommand}"/>
+                                <Button Content="Remove protection" Style="{StaticResource DangerButton}" Command="{Binding RemovePathCommand}"/>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,8,0,0" Text="Rules are matched on canonical paths: '..', short 8.3 names, \\?\ prefixes, letter case, symbolic links and junctions are all resolved before checking, so alternate spellings cannot bypass a rule."/>
+                        </StackPanel>
+                    </Border>
+                    <DataGrid ItemsSource="{Binding Paths}" SelectedItem="{Binding SelectedPath}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="FOLDER" Binding="{Binding Path}" Width="*"/>
+                            <DataGridTextColumn Header="RULES" Binding="{Binding Rules}" Width="320"/>
+                            <DataGridTextColumn Header="LABEL" Binding="{Binding Label}" Width="260"/>
+                            <DataGridCheckBoxColumn Header="BUILT-IN" Binding="{Binding BuiltIn}" Width="70"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Credentials">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="Add credential…" Style="{StaticResource PrimaryButton}" Command="{Binding AddCredentialCommand}"/>
+                        <Button Content="Delete" Style="{StaticResource DangerButton}" Command="{Binding RemoveCredentialCommand}"/>
+                    </StackPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Values live only in Windows Credential Manager (per user, this PC). This list shows references; values are never displayed, logged, exported or given to extensions (extensions receive opaque references only)."/>
+                    <DataGrid ItemsSource="{Binding Credentials}" SelectedItem="{Binding SelectedCredential}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NAME" Binding="{Binding DisplayName}" Width="260"/>
+                            <DataGridTextColumn Header="KIND" Binding="{Binding Kind}" Width="220"/>
+                            <DataGridTextColumn Header="CREATED" Binding="{Binding CreatedAt, StringFormat=yyyy-MM-dd HH:mm}" Width="140"/>
+                            <DataGridTextColumn Header="REFERENCE" Binding="{Binding Id}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Audit log">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,8">
+                        <Button Content="Verify integrity" Command="{Binding VerifyAuditCommand}"/>
+                        <Button Content="Refresh" Command="{Binding RefreshAuditCommand}"/>
+                        <TextBlock Text="{Binding AuditStatus}" Foreground="{DynamicResource Accent}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+                    <DataGrid ItemsSource="{Binding Audit}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="TIME (UTC)" Binding="{Binding Timestamp, StringFormat=yyyy-MM-dd HH:mm:ss}" Width="140"/>
+                            <DataGridTextColumn Header="ACTION" Binding="{Binding Action}" Width="200"/>
+                            <DataGridTextColumn Header="COMPONENT" Binding="{Binding Component}" Width="170"/>
+                            <DataGridTextColumn Header="RESULT" Binding="{Binding Result}" Width="80"/>
+                            <DataGridTextColumn Header="CLASS" Binding="{Binding Classification}" Width="90"/>
+                            <DataGridTextColumn Header="RESOURCE" Binding="{Binding AffectedResource}" Width="220"/>
+                            <DataGridTextColumn Header="CORRELATION" Binding="{Binding Correlation}" Width="100"/>
+                            <DataGridTextColumn Header="DETAIL" Binding="{Binding Detail}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

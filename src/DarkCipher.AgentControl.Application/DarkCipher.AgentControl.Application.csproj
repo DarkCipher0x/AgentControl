@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Application: use cases (recommendation, setup planning, stacks, sessions, diagnostics). Depends on Domain only. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkCipher.AgentControl.Domain\DarkCipher.AgentControl.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DarkCipher.AgentControl.Tests" />
+  </ItemGroup>
+</Project>

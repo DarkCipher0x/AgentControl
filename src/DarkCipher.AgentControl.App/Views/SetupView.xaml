@@ -1,0 +1,204 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.SetupView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DarkCipher.AgentControl.App.ViewModels">
+    <UserControl.Resources>
+        <Style x:Key="StepPanel" TargetType="StackPanel">
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel Margin="24,18,24,18">
+        <ContentPresenter DockPanel.Dock="Top" Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+
+        <!-- Step indicator -->
+        <StackPanel DockPanel.Dock="Top" Margin="0,0,0,14">
+            <ItemsControl ItemsSource="{Binding StepNames}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" Margin="0,0,18,0" FontSize="{DynamicResource FsSmall}" Foreground="{DynamicResource Muted}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ProgressBar Maximum="8" Value="{Binding StepIndex, Mode=OneWay}" Margin="0,6,0,0" Height="3"/>
+        </StackPanel>
+
+        <!-- Navigation bar -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="0,12,0,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Content="Back" Command="{Binding BackCommand}"/>
+                    <Button Content="{Binding NextLabel}" Style="{StaticResource PrimaryButton}" Command="{Binding NextCommand}" MinWidth="120"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Content="Cancel" Command="{Binding CancelCommand}" ToolTip="Stop safely. Downloads already finished are kept; nothing else changes."/>
+                    <Button Content="Rescan" Command="{Binding RescanCommand}"/>
+                    <Button Content="Technical details" Command="{Binding DetailsCommand}"/>
+                    <TextBlock Text="Working…" Foreground="{DynamicResource Accent}" VerticalAlignment="Center" Margin="8,0" Visibility="{Binding Busy, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Failure actions -->
+        <Border DockPanel.Dock="Bottom" Style="{StaticResource Notice}" BorderBrush="{DynamicResource Bad}" Visibility="{Binding Failed, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="Setup stopped" Style="{StaticResource H2}"/>
+                <TextBlock Text="{Binding Message}" Style="{StaticResource Body}"/>
+                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                    <Button Content="Retry" Style="{StaticResource PrimaryButton}" Command="{Binding RetryCommand}"/>
+                    <Button Content="Change model" Command="{Binding ChangeModelCommand}"/>
+                    <Button Content="View logs" Command="{Binding ViewLogsCommand}"/>
+                    <Button Content="Cancel" Command="{Binding CancelCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <!-- Welcome -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers><DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Welcome}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Border Style="{StaticResource Card}" MaxWidth="820" HorizontalAlignment="Left">
+                        <StackPanel>
+                            <TextBlock Text="Set up a private, local AI coding assistant" Style="{StaticResource H2}"/>
+                            <TextBlock Style="{StaticResource Body}" Text="This guide checks your hardware, finds what is already installed, recommends a model that fits your PC, shows you every change before it happens, downloads and verifies the model, configures your agent in an isolated profile, tests it, and starts your first session."/>
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,10,0,0" Text="Nothing is installed silently. No administrator rights are needed. You can go back, skip or cancel at any point."/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Hardware / Software facts -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.HardwareScan}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.SoftwareDetection}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Border Style="{StaticResource Card}">
+                        <ItemsControl ItemsSource="{Binding Facts}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,4">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Status}" Foreground="{Binding Brush}"/>
+                                        <TextBlock Grid.Column="2" Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                </StackPanel>
+
+                <!-- Recommended setup -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers><DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.RecommendedSetup}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Border Style="{StaticResource Card}" MaxWidth="820" HorizontalAlignment="Left">
+                        <StackPanel>
+                            <TextBlock Text="PLAN" Style="{StaticResource Label}"/>
+                            <ComboBox ItemsSource="{Binding Plans}" SelectedItem="{Binding Plan}" Width="260" HorizontalAlignment="Left"/>
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,12" Text="Balanced = best agentic-coding model that fits fully in GPU memory. Lightweight = small and fast. High Quality = largest that fits. CPU-Only = small models without a GPU. Hybrid = cloud agent. Advanced = allows partial GPU offload."/>
+                            <TextBlock Text="AGENT" Style="{StaticResource Label}"/>
+                            <ComboBox ItemsSource="{Binding AgentChoices}" SelectedValuePath="Key" DisplayMemberPath="Value" SelectedValue="{Binding AgentId}" Width="520" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Model selection -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers><DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.ModelSelection}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="Recommended for this PC (memory estimates explained; no speed figures until tested here)" Style="{StaticResource MutedText}" Margin="0,0,0,8"/>
+                    <ListBox ItemsSource="{Binding Recommendations}" SelectedItem="{Binding SelectedModel}" MaxHeight="520" BorderThickness="1">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="0,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Model.DisplayName}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}"/>
+                                        <TextBlock Text="{Binding Model.OllamaName}" Style="{StaticResource Mono}" Margin="10,0,0,0" Foreground="{DynamicResource Muted}"/>
+                                        <Border Style="{StaticResource Badge}" Margin="10,0,0,0"><TextBlock Text="{Binding Fit}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                        <Border Style="{StaticResource Badge}" Visibility="{Binding Installed, Converter={StaticResource BoolToVis}}"><TextBlock Text="INSTALLED" Foreground="{DynamicResource Good}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Reason}" Style="{StaticResource MutedText}" MaxWidth="1000" HorizontalAlignment="Left"/>
+                                    <ItemsControl ItemsSource="{Binding Limitations}">
+                                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=· {0}}" Style="{StaticResource MutedText}" FontSize="{DynamicResource FsSmall}"/></DataTemplate></ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Plan preview -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers><DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Plan}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <TextBlock Text="Planned operations — nothing has happened yet" Style="{StaticResource H2}"/>
+                    <DataGrid ItemsSource="{Binding Operations}" MaxHeight="360">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="STEP" Binding="{Binding Title}" Width="240"/>
+                            <DataGridTextColumn Header="STATE" Binding="{Binding State}" Width="170"/>
+                            <DataGridTextColumn Header="DOWNLOAD" Binding="{Binding DownloadBytes, Converter={StaticResource Bytes}}" Width="90"/>
+                            <DataGridTextColumn Header="LOCATION / SOURCE" Binding="{Binding Location}" Width="200"/>
+                            <DataGridTextColumn Header="DETAIL" Binding="{Binding Detail}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <ItemsControl ItemsSource="{Binding PlanNotes}" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource Body}" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+                <!-- Install / verify log -->
+                <Border>
+                    <Border.Style>
+                        <Style TargetType="Border" BasedOn="{StaticResource Card}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Installation}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Verification}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Ready}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                                <DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.ModelSelection}"><Setter Property="Visibility" Value="Visible"/></DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Border.Style>
+                    <ItemsControl ItemsSource="{Binding Lines}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource Mono}" Margin="0,1"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Ready -->
+                <StackPanel>
+                    <StackPanel.Style>
+                        <Style TargetType="StackPanel" BasedOn="{StaticResource StepPanel}">
+                            <Style.Triggers><DataTrigger Binding="{Binding Step}" Value="{x:Static vm:SetupStep.Ready}"><Setter Property="Visibility" Value="Visible"/></DataTrigger></Style.Triggers>
+                        </Style>
+                    </StackPanel.Style>
+                    <Border Style="{StaticResource Card}" BorderBrush="{DynamicResource AccentDim}" HorizontalAlignment="Left">
+                        <StackPanel>
+                            <TextBlock Text="READY TO CODE" Style="{StaticResource Value}" Foreground="{DynamicResource Accent}"/>
+                            <TextBlock Text="Start your first session in the sample project. It opens in its own terminal window." Style="{StaticResource Body}" Margin="0,6,0,12"/>
+                            <Button Content="Start first session" Style="{StaticResource PrimaryButton}" Command="{Binding StartSessionCommand}" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</UserControl>

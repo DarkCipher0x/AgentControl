@@ -1,0 +1,20 @@
+{
+  "id": "com.example.agent-detector",
+  "name": "Agent CLI detector",
+  "publisher": "Example Labs",
+  "version": "1.0.0",
+  "description": "Code sample: a command that looks for other agentic CLIs on PATH through the capability broker. Detection only.",
+  "minAppVersion": "0.1.0",
+  "maxTestedVersion": "0.1.0",
+  "sdkVersion": "1.0.0",
+  "entryPoint": "AgentDetector.dll!Sample.AgentDetector.Entry",
+  "types": ["Command"],
+  "permissions": ["ProcessExecution", "UI", "Logging"],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "MIT",
+  "source": null,
+  "signature": null,
+  "contributes": { "stackTemplates": [], "modelCatalogs": [] }
+}

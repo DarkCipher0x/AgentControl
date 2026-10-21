@@ -1,0 +1,269 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="Field" TargetType="StackPanel"><Setter Property="Margin" Value="0,0,0,12"/></Style>
+        <Style x:Key="FieldCombo" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}"><Setter Property="Width" Value="340"/><Setter Property="HorizontalAlignment" Value="Left"/></Style>
+        <DataTemplate x:Key="ToggleList">
+            <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" IsEnabled="{Binding Enabled}" AutomationProperties.Name="{Binding Label}"/>
+        </DataTemplate>
+        <Style x:Key="ResetButton" TargetType="Button" BasedOn="{StaticResource SmallButton}"><Setter Property="HorizontalAlignment" Value="Left"/><Setter Property="Margin" Value="0,8,0,0"/></Style>
+    </UserControl.Resources>
+    <DockPanel Margin="{DynamicResource PageMargin}">
+        <ContentPresenter DockPanel.Dock="Top" Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource MutedText}" Margin="0,8,0,0">
+            <Run Text="{Binding Message, Mode=OneWay}"/><Run Text=" "/><Run Text="{Binding Appearance.Message, Mode=OneWay}"/>
+        </TextBlock>
+        <TabControl>
+            <!-- General (unchanged behaviour settings) -->
+            <TabItem Header="General">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="900" HorizontalAlignment="Left">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="OLLAMA ENDPOINT" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding Endpoint, UpdateSourceTrigger=PropertyChanged}" FontFamily="{DynamicResource MonoFont}" Width="360" HorizontalAlignment="Left" AutomationProperties.Name="Ollama endpoint"/>
+                                <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,10" Text="Default http://127.0.0.1:11434 (this PC only). Anything else must be approved in Security → Network and needs 'Allow remote runtimes'. Restart after changing."/>
+                                <TextBlock Text="PREFERRED AGENT FOR QUICK SETUP" Style="{StaticResource Label}"/>
+                                <ComboBox ItemsSource="{Binding Agents}" SelectedItem="{Binding PreferredAgent}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,12" AutomationProperties.Name="Preferred agent"/>
+                                <Button Content="Save" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="HUGGING FACE TOKEN" Style="{StaticResource Label}"/>
+                                <TextBlock Text="{Binding HfTokenStatus}" Style="{StaticResource Body}" Margin="0,0,0,8"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Set token…" Command="{Binding SetHfTokenCommand}"/>
+                                    <Button Content="Remove token" Style="{StaticResource DangerButton}" Command="{Binding ClearHfTokenCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="DATA FOLDER" Style="{StaticResource Label}"/>
+                                <TextBlock Text="{Binding DataRoot}" Style="{StaticResource Mono}"/>
+                                <TextBlock Style="{StaticResource MutedText}" Margin="0,4,0,8" Text="Settings, stacks, projects, backups, logs and the audit log. No secrets are stored here (they are in Windows Credential Manager)."/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="Open data folder" Command="{Binding OpenDataCommand}"/>
+                                    <Button Content="Show Quick Setup again" Command="{Binding ResetOnboardingCommand}"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="UPDATES" Style="{StaticResource Label}"/>
+                                <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Body}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Appearance -->
+            <TabItem Header="Appearance">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Theme" Style="{StaticResource CardTitle}"/>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="PRESET" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Theme preset"/>
+                                    <TextBlock Text="{Binding ThemeNote}" Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="ACCENT COLOUR" Style="{StaticResource Label}"/>
+                                    <ItemsControl ItemsSource="{Binding Swatches}" Focusable="False">
+                                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Command="{Binding Apply}" ToolTip="{Binding Name}" AutomationProperties.Name="{Binding Name, StringFormat=Accent {0}}" MinWidth="0" Padding="4" Margin="0,0,6,0">
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <Border Width="16" Height="16" Background="{Binding Brush}" CornerRadius="{DynamicResource Radius}"/>
+                                                        <TextBlock Text="{Binding Name}" Margin="6,0,2,0" FontSize="{DynamicResource FsSmall}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                        <TextBlock Text="Custom #" VerticalAlignment="Center" Style="{StaticResource Body}"/>
+                                        <TextBox Text="{Binding CustomAccent, UpdateSourceTrigger=PropertyChanged}" Width="100" FontFamily="{DynamicResource MonoFont}" Margin="4,0,8,0" AutomationProperties.Name="Custom accent colour"/>
+                                        <Button Content="Apply" Command="{Binding ApplyCustomAccentCommand}"/>
+                                        <TextBlock Text="{Binding CurrentAccent, StringFormat=In use: {0}}" Style="{StaticResource Caption}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                                    </StackPanel>
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0" Text="Custom accents must reach 3:1 contrast against the background, so focus rings and selections stay visible."/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="STATUS COLOUR INTENSITY" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding Intensities}" SelectedItem="{Binding Intensity}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Status colour intensity"/>
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0" Text="Status is always written as text too; colour is never the only signal."/>
+                                </StackPanel>
+                                <CheckBox Content="Use the High Contrast preset when Windows high contrast is on" IsChecked="{Binding FollowWindowsHighContrast}"/>
+                                <Button Content="Reset theme" Style="{StaticResource ResetButton}" Command="{Binding ResetCommand}" CommandParameter="Theme"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <TextBlock Text="Layout and text" Style="{StaticResource CardTitle}"/>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="DENSITY" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding Densities}" SelectedItem="{Binding Density}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Density"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="TEXT SIZE" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding TextScales}" SelectedItem="{Binding TextScale}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Text size"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="INTERFACE ZOOM" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding UiScales}" SelectedItem="{Binding UiScale}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Interface zoom"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="CORNERS" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding CornerStyles}" SelectedItem="{Binding Corners}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Corner style"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="ANIMATION" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding MotionLevels}" SelectedItem="{Binding Motion}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Animation level"/>
+                                </StackPanel>
+                                <Button Content="Reset layout and text" Style="{StaticResource ResetButton}" Command="{Binding ResetCommand}" CommandParameter="Layout"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Navigation -->
+            <TabItem Header="Navigation">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="SIDEBAR" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding NavStyles}" SelectedItem="{Binding NavStyle}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Sidebar style"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="SIDEBAR WIDTH (expanded)" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding NavWidths}" SelectedItem="{Binding NavWidth}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Sidebar width"/>
+                                </StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="OPEN ON START" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding Pages}" SelectedItem="{Binding LandingPage}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Landing page"/>
+                                </StackPanel>
+                                <CheckBox Content="Show developer sections (Developer / SDK)" IsChecked="{Binding ShowDeveloperSections}"/>
+                                <CheckBox Content="Show experimental sections" IsChecked="{Binding ShowExperimentalSections}"/>
+                                <CheckBox Content="Show advanced information (custom tools, technical details)" IsChecked="{Binding ShowAdvancedInformation}"/>
+                            </StackPanel>
+                        </Border>
+                        <UniformGrid Columns="2">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Pinned (top of the sidebar, max 6)" Style="{StaticResource CardTitle}"/>
+                                    <ItemsControl ItemsSource="{Binding PinnedPages}" ItemTemplate="{StaticResource ToggleList}" Focusable="False"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Shown in the sidebar" Style="{StaticResource CardTitle}"/>
+                                    <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,6" Text="Pages with security or active-session controls are always shown. Hidden pages stay reachable from links."/>
+                                    <ItemsControl ItemsSource="{Binding VisiblePages}" ItemTemplate="{StaticResource ToggleList}" Focusable="False"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Button Content="Reset navigation" Style="{StaticResource ResetButton}" Command="{Binding ResetCommand}" CommandParameter="Navigation"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Dashboard -->
+            <TabItem Header="Dashboard">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel>
+                                <StackPanel Style="{StaticResource Field}">
+                                    <TextBlock Text="LAYOUT" Style="{StaticResource Label}"/>
+                                    <ComboBox ItemsSource="{Binding DashboardModes}" SelectedItem="{Binding DashboardMode}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Dashboard layout"/>
+                                </StackPanel>
+                                <CheckBox Content="Show hardware details" IsChecked="{Binding ShowHardwareDetails}"/>
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0" Text="Reorder and resize cards on the Dashboard itself (Customise)."/>
+                            </StackPanel>
+                        </Border>
+                        <UniformGrid Columns="2">
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Cards" Style="{StaticResource CardTitle}"/>
+                                    <ItemsControl ItemsSource="{Binding Cards}" ItemTemplate="{StaticResource ToggleList}" Focusable="False"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource Card}">
+                                <StackPanel>
+                                    <TextBlock Text="Quick actions (max 4)" Style="{StaticResource CardTitle}"/>
+                                    <ItemsControl ItemsSource="{Binding QuickActions}" ItemTemplate="{StaticResource ToggleList}" Focusable="False"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+                        <Button Content="Reset dashboard" Style="{StaticResource ResetButton}" Command="{Binding ResetCommand}" CommandParameter="Dashboard"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Console -->
+            <TabItem Header="Console">
+                <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Text="CONSOLE FONT SIZE" Style="{StaticResource Label}"/>
+                                <ComboBox ItemsSource="{Binding ConsoleSizes}" SelectedItem="{Binding ConsoleSize}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Console font size"/>
+                            </StackPanel>
+                            <StackPanel Style="{StaticResource Field}">
+                                <TextBlock Text="CONSOLE COLOURS" Style="{StaticResource Label}"/>
+                                <ComboBox ItemsSource="{Binding ConsolePresets}" SelectedItem="{Binding Console}" Style="{StaticResource FieldCombo}" AutomationProperties.Name="Console colours"/>
+                            </StackPanel>
+                            <TextBlock Text="PREVIEW" Style="{StaticResource Label}"/>
+                            <TextBox Text="{Binding ConsoleSample, Mode=OneWay}" Style="{StaticResource Console}" Height="90" AutomationProperties.Name="Console preview"/>
+                            <Button Content="Reset console" Style="{StaticResource ResetButton}" Command="{Binding ResetCommand}" CommandParameter="Console"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+
+            <!-- Import / export -->
+            <TabItem Header="Import &amp; export">
+                <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Style="{StaticResource Body}" Margin="0,0,0,10" Text="Export or import appearance, navigation, dashboard and console settings as JSON. Exports never contain credentials, tokens, private repository access, environment variables or project data. Imports are validated and previewed before anything changes."/>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Export…" Command="{Binding ExportCommand}"/>
+                                <Button Content="Import…" Command="{Binding ImportCommand}"/>
+                                <Button Content="Reset everything" Style="{StaticResource DangerButton}" Command="{Binding ResetCommand}" CommandParameter="All"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+
+            <!-- About -->
+            <TabItem Header="About">
+                <StackPanel MaxWidth="900" HorizontalAlignment="Left" DataContext="{Binding Appearance}">
+                    <Border Style="{StaticResource Card}">
+                        <DockPanel>
+                            <Image DockPanel.Dock="Left" Source="{Binding AppIcon}" Width="128" Height="128" Margin="0,0,20,0" AutomationProperties.Name="DarkCipher AgentControl icon" RenderOptions.BitmapScalingMode="HighQuality"/>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Version}" Style="{StaticResource PageTitle}"/>
+                                <TextBlock Text="DarkCipher Systems · built by DarkCipher0x" Style="{StaticResource BodySecondary}" Margin="0,2,0,8"/>
+                                <TextBlock Text="{Binding IconFrames}" Style="{StaticResource Caption}"/>
+                                <TextBlock Text="{Binding Typography}" Style="{StaticResource Caption}" Margin="0,4,0,0"/>
+                                <TextBlock Style="{StaticResource Caption}" Margin="0,4,0,0" Text="Design system shared with WhisperDesk and ServerManagement. Unsigned build: verify downloads against SHA256SUMS.txt."/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                </StackPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

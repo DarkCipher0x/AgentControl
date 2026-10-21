@@ -1,0 +1,104 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.ServicesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,18,12,18">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Refresh" Command="{Binding RefreshCommand}" VerticalAlignment="Top"/>
+                <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+            </DockPanel>
+            <TextBlock Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,0,0,8"
+                       Visibility="{Binding Message, Converter={StaticResource NullToCollapsed}}"/>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Start Ollama" Command="{Binding StartOllamaCommand}" VerticalAlignment="Top"
+                                ToolTip="Starts the installed Ollama with its own app (it keeps running after this app closes). Does nothing if it is already running."/>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="10" Height="10" Fill="{Binding HealthBrush}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Ollama" Style="{StaticResource H2}" Margin="0"/>
+                        </StackPanel>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Summary}" Style="{StaticResource Body}" Margin="0,6,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="170"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                        <TextBlock Text="VERSION" Style="{StaticResource Label}"/><TextBlock Grid.Column="1" Text="{Binding Version}" Style="{StaticResource Mono}"/>
+                        <TextBlock Grid.Row="1" Text="ENDPOINT" Style="{StaticResource Label}"/><TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Endpoint}" Style="{StaticResource Mono}"/>
+                        <TextBlock Grid.Row="2" Text="CONNECTION" Style="{StaticResource Label}"/><TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Classification}" Style="{StaticResource Mono}"/>
+                        <TextBlock Grid.Row="3" Text="INSTALLED AT" Style="{StaticResource Label}"/><TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding InstallLocation}" Style="{StaticResource Mono}"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Unload" Command="{Binding UnloadCommand}"/>
+                        <TextBlock Text="Loaded models" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <DataGrid ItemsSource="{Binding Running}" SelectedItem="{Binding Selected}" MaxHeight="260" shell:ContextMenus.Provider="{Binding}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="MODEL" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="SIZE" Binding="{Binding SizeBytes, Converter={StaticResource Bytes}}" Width="100"/>
+                            <DataGridTextColumn Header="ON GPU" Binding="{Binding GpuFraction, StringFormat=P0}" Width="80"/>
+                            <DataGridTextColumn Header="CONTEXT" Binding="{Binding ContextLength, StringFormat=N0}" Width="90"/>
+                            <DataGridTextColumn Header="UNLOADS AT" Binding="{Binding ExpiresAt, StringFormat=HH:mm:ss}" Width="100"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Model runtimes" Style="{StaticResource H2}"/>
+                    <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,4" Text="Install, update or remove a runtime right here (winget, per-user, with a plan you approve). Right-click for homepage, folder, winget id and more."/>
+                    <ItemsControl ItemsSource="{Binding Runtimes}" ItemTemplate="{StaticResource ToolRowCompact}" Focusable="False" shell:ContextMenus.Provider="{Binding}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Gateways" Style="{StaticResource H2}"/>
+                    <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,4" Text="API servers built into the runtimes. Installing a gateway installs its runtime; 'not running' means its local port is closed."/>
+                    <ItemsControl ItemsSource="{Binding Gateways}" ItemTemplate="{StaticResource ToolRowCompact}" Focusable="False" shell:ContextMenus.Provider="{Binding}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Gateway: Ollama Anthropic-compatible API (for Claude Code local mode)" Style="{StaticResource H2}"/>
+                    <TextBlock Style="{StaticResource Body}" Text="Address /v1/messages on the Ollama endpoint above · protocol Anthropic Messages · no authentication (local) · licence MIT. Run 'Test Claude Code gateway' in Models to verify a specific model."/>
+                    <ItemsControl ItemsSource="{Binding GatewayLimitations}" Margin="0,8,0,0">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=⚠ {0}}" Style="{StaticResource MutedText}" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <DockPanel>
+                        <Button DockPanel.Dock="Right" Content="Run checks" Command="{Binding RunChecksCommand}"/>
+                        <TextBlock Text="Extension health checks" Style="{StaticResource H2}"/>
+                    </DockPanel>
+                    <TextBlock Text="{Binding ExtensionChecksNote}" Style="{StaticResource MutedText}"/>
+                    <ItemsControl ItemsSource="{Binding ExtensionChecks}" Margin="0,6,0,0" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,3">
+                                    <TextBlock DockPanel.Dock="Left" Text="{Binding Status}" Foreground="{Binding Brush}" FontWeight="SemiBold" Width="90"/>
+                                    <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" Width="300" Style="{StaticResource Body}"/>
+                                    <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Not available yet" Style="{StaticResource H2}"/>
+                    <ItemsControl ItemsSource="{Binding PlannedRuntimes}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding}" Style="{StaticResource MutedText}" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Infrastructure: persistence (typed config store), observability (structured logs), Windows hardware discovery. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkCipher.AgentControl.Domain\DarkCipher.AgentControl.Domain.csproj" />
+    <ProjectReference Include="..\DarkCipher.AgentControl.Security\DarkCipher.AgentControl.Security.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Management" Version="8.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DarkCipher.AgentControl.Tests" />
+  </ItemGroup>
+</Project>

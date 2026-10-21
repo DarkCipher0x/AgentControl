@@ -1,0 +1,6 @@
+[
+  { "Id": "gallery-claude-gptoss", "Name": "Claude Code + gpt-oss 20B (Experimental)", "Description": "Claude Code with gpt-oss:20b through Ollama's Anthropic-compatible gateway, 64K context. Needs about 16 GB of GPU memory.",
+    "AgentProviderId": "claude-code", "AgentMode": "ExperimentalLocalGateway", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "gpt-oss:20b", "UtilityModel": null, "ContextLength": 65536 },
+  { "Id": "gallery-claude-qwen3coder", "Name": "Claude Code + qwen3-coder 30B (Experimental)", "Description": "Claude Code with qwen3-coder:30b through the gateway, 64K context. Needs 24 GB of GPU memory or partial CPU offload.",
+    "AgentProviderId": "claude-code", "AgentMode": "ExperimentalLocalGateway", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen3-coder:30b", "UtilityModel": null, "ContextLength": 65536 }
+]

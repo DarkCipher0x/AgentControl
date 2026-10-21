@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0-windows7.0": {
+      "Microsoft.Extensions.DependencyInjection": {
+        "type": "Direct",
+        "requested": "[8.0.1, )",
+        "resolved": "8.0.1",
+        "contentHash": "BmANAnR5Xd4Oqw7yQ75xOAYODybZQRzdeNucg7kS5wWKd2PNnMdYtJ2Vciy0QLylRmv42DGl5+AFL9izA6F1Rw==",
+        "dependencies": {
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.2"
+        }
+      },
+      "Microsoft.Extensions.DependencyInjection.Abstractions": {
+        "type": "Transitive",
+        "resolved": "8.0.2",
+        "contentHash": "3iE7UF7MQkCv1cxzCahz+Y/guQbTqieyxyaWKhrRO91itI9cOKO76OHeQDahqG4MmW5umr3CcCvGmK92lWNlbg=="
+      },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "WTlRjL6KWIMr/pAaq3rYqh0TJlzpouaQ/W1eelssHgtlwHAH25jXTkUphTYx9HaIIf7XA6qs/0+YhtLEQRkJ+Q=="
+      },
+      "System.Management": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        }
+      },
+      "System.Security.Cryptography.ProtectedData": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "+TUFINV2q2ifyXauQXRwy4CiBhqvDEDZeVJU7qfxya4aRYOKzVBpN+4acx25VcPB9ywUN6C0n8drWl110PhZEg=="
+      },
+      "darkcipher.agentcontrol.application": {
+        "type": "Project",
+        "dependencies": {
+          "DarkCipher.AgentControl.Domain": "[0.1.2, )"
+        }
+      },
+      "darkcipher.agentcontrol.domain": {
+        "type": "Project"
+      },
+      "darkcipher.agentcontrol.extensions": {
+        "type": "Project",
+        "dependencies": {
+          "DarkCipher.AgentControl.Domain": "[0.1.2, )",
+          "DarkCipher.AgentControl.Sdk": "[1.0.0, )"
+        }
+      },
+      "darkcipher.agentcontrol.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "DarkCipher.AgentControl.Domain": "[0.1.2, )",
+          "DarkCipher.AgentControl.Security": "[0.1.2, )",
+          "System.Management": "[8.0.0, )"
+        }
+      },
+      "darkcipher.agentcontrol.integrations": {
+        "type": "Project",
+        "dependencies": {
+          "DarkCipher.AgentControl.Domain": "[0.1.2, )"
+        }
+      },
+      "darkcipher.agentcontrol.sdk": {
+        "type": "Project"
+      },
+      "darkcipher.agentcontrol.security": {
+        "type": "Project",
+        "dependencies": {
+          "DarkCipher.AgentControl.Domain": "[0.1.2, )",
+          "System.Security.Cryptography.ProtectedData": "[8.0.0, )"
+        }
+      }
+    },
+    "net8.0-windows7.0/win-x64": {
+      "System.Management": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "jrK22i5LRzxZCfGb+tGmke2VH7oE0DvcDlJ1HAKYU8cPmD8XnpUT0bYn2Gy98GEhGjtfbR/sxKTVb+dE770pfA==",
+        "dependencies": {
+          "System.CodeDom": "8.0.0"
+        }
+      }
+    }
+  }
+}

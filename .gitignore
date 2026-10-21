@@ -1,0 +1,15 @@
+bin/
+obj/
+.vs/
+*.user
+.nuget/
+.tmp/
+.selftest/
+.selftest-*/
+dist/
+TestResults/
+.backups/
+# Never in any repository: the local privacy term list and the pinned gitleaks binary (tools/release/get-gitleaks.ps1)
+*.local.txt
+tools/bin/
+.claude/

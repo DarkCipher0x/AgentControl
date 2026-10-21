@@ -1,0 +1,20 @@
+{
+  "id": "com.example.rust-stacks",
+  "name": "Rust coding stacks",
+  "publisher": "Example Labs",
+  "version": "1.0.0",
+  "description": "Declarative sample: adds two local stack templates tuned for Rust work. Runs no code.",
+  "minAppVersion": "0.1.0",
+  "maxTestedVersion": "0.1.0",
+  "sdkVersion": "1.0.0",
+  "entryPoint": null,
+  "types": ["StackTemplate"],
+  "permissions": [],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "MIT",
+  "source": "https://example.com/rust-stacks",
+  "signature": null,
+  "contributes": { "stackTemplates": ["templates/stacks.json"], "modelCatalogs": [] }
+}

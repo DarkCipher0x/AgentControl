@@ -1,0 +1,6 @@
+[
+  { "Id": "gallery-web-codex", "Name": "Web - Codex + Ollama", "Description": "Codex with a coding model for TypeScript, React and Node.js; 32K context for component trees.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen2.5-coder:14b", "UtilityModel": "qwen2.5-coder:7b", "ContextLength": 32768 },
+  { "Id": "gallery-web-large", "Name": "Web - large repository", "Description": "A larger agentic model and a 64K context for monorepos. Needs 16 GB or more of GPU memory.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen3-coder:30b", "UtilityModel": "qwen2.5-coder:7b", "ContextLength": 65536 }
+]

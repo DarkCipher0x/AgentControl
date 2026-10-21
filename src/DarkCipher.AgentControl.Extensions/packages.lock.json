@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "dependencies": {
+    "net8.0": {
+      "darkcipher.agentcontrol.domain": {
+        "type": "Project"
+      },
+      "darkcipher.agentcontrol.sdk": {
+        "type": "Project"
+      }
+    },
+    "net8.0/win-x64": {}
+  }
+}

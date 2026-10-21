@@ -1,0 +1,102 @@
+<Window x:Class="DarkCipher.AgentControl.App.Shell.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="DarkCipher AgentControl" Height="900" Width="1440" MinHeight="640" MinWidth="1080"
+        WindowStartupLocation="CenterScreen" Background="{DynamicResource Bg}" Foreground="{DynamicResource Fg}"
+        FontFamily="{DynamicResource UiFont}" FontSize="{DynamicResource FsBase}" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+    <DockPanel LayoutTransform="{DynamicResource UiScaleTransform}">
+        <!-- Header: HeaderBg/HeaderFg stay dark in every theme (as in WhisperDesk/ServerManagement). Security badges are always shown. -->
+        <Border DockPanel.Dock="Top" Background="{DynamicResource HeaderBg}" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="16,10">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Style="{StaticResource Badge}" Background="Transparent" BorderBrush="{DynamicResource Bad}" Visibility="{Binding SafeMode, Converter={StaticResource BoolToVis}}"
+                            ToolTip="Safe Mode: third-party extensions are not loaded.">
+                        <TextBlock Text="SAFE MODE" Foreground="{DynamicResource Bad}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/>
+                    </Border>
+                    <Border Style="{StaticResource Badge}" Background="Transparent" BorderBrush="{DynamicResource Warn}" Visibility="{Binding DevelopmentMode, Converter={StaticResource BoolToVis}}"
+                            ToolTip="Development Mode is ON: unsigned code extensions can load in-process without isolation. Turn it off in Developer / SDK when you are done.">
+                        <TextBlock Text="⚠ DEVELOPMENT MODE" Foreground="{DynamicResource Warn}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/>
+                    </Border>
+                    <Border Style="{StaticResource Badge}" Background="Transparent" BorderBrush="{DynamicResource Brand}" ToolTip="{Binding PrivacyTooltip}">
+                        <TextBlock Text="{Binding PrivacyBadge}" Foreground="{DynamicResource Brand}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/>
+                    </Border>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <ContentControl Template="{StaticResource BrandMark}" Width="30" Height="30" Margin="0,0,12,0" Focusable="False" AutomationProperties.Name="DarkCipher AgentControl logo"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="DarkCipher AgentControl" FontFamily="{DynamicResource ChromeFont}" FontSize="{DynamicResource FsTitle}" FontWeight="SemiBold" Foreground="{DynamicResource HeaderFg}"/>
+                            <TextBlock Text="{Binding Version}" Foreground="{DynamicResource HeaderMuted}" FontFamily="{DynamicResource MonoFont}" FontSize="{DynamicResource FsCaption}" Margin="10,0,0,1" VerticalAlignment="Bottom"/>
+                        </StackPanel>
+                        <TextBlock Text="DarkCipher Systems · agentic AI control plane" Foreground="{DynamicResource HeaderMuted}" FontSize="{DynamicResource FsCaption}"/>
+                    </StackPanel>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Status bar: current status and recent destinations -->
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Line}" BorderThickness="0,1,0,0" Padding="12,3">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="Least privilege · never elevated" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,18,0" VerticalAlignment="Center">
+                    <TextBlock Text="Recent:" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}" Margin="0,0,6,0"
+                               Visibility="{Binding HasRecent, Converter={StaticResource BoolToVis}}"/>
+                    <ItemsControl ItemsSource="{Binding Nav.Recent}" Focusable="False">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Content="{Binding Title}" Style="{StaticResource LinkButton}" FontSize="{DynamicResource FsCaption}" Margin="0,0,10,0"
+                                        Command="{Binding DataContext.GoCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}" CommandParameter="{Binding Key}"
+                                        AutomationProperties.Name="{Binding Title, StringFormat=Go to {0}}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+                <TextBlock Text="{Binding Nav.Status}" Foreground="{DynamicResource Muted}" FontFamily="{DynamicResource MonoFont}" FontSize="{DynamicResource FsCaption}"/>
+            </DockPanel>
+        </Border>
+
+        <!-- Sidebar (expanded, compact or icon-only; Settings → Navigation) -->
+        <Border DockPanel.Dock="Left" Width="{DynamicResource NavWidth}" Background="{DynamicResource Surface}" BorderBrush="{DynamicResource Line}" BorderThickness="0,0,1,0">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="NavList" ItemsSource="{Binding Nav.Items}" Margin="0,8,0,12" Focusable="False" KeyboardNavigation.TabNavigation="Once">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Text="{Binding Group}" Style="{StaticResource NavHeader}">
+                                    <TextBlock.Visibility>
+                                        <MultiBinding Converter="{StaticResource AllTrueToVis}">
+                                            <Binding Path="FirstInGroup"/>
+                                            <Binding Path="DataContext.ShowNavTitles" RelativeSource="{RelativeSource AncestorType=ItemsControl}"/>
+                                        </MultiBinding>
+                                    </TextBlock.Visibility>
+                                </TextBlock>
+                                <RadioButton Style="{StaticResource NavButton}" GroupName="nav" ToolTip="{Binding Hint}" Checked="OnNavChecked" Tag="{Binding}"
+                                             AutomationProperties.Name="{Binding Title}" AutomationProperties.HelpText="{Binding Hint}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Glyph}" FontFamily="{DynamicResource IconFont}" FontSize="{DynamicResource FsNavIcon}" Width="22" Foreground="{DynamicResource Accent}" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center"
+                                                   Visibility="{Binding DataContext.ShowNavTitles, RelativeSource={RelativeSource AncestorType=ItemsControl}, Converter={StaticResource BoolToVis}}"/>
+                                    </StackPanel>
+                                </RadioButton>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Page -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Border Grid.Row="0" Style="{StaticResource Notice}" BorderBrush="{DynamicResource Warn}" Margin="20,12,20,0"
+                    Visibility="{Binding RecoveryNotice, Converter={StaticResource NullToCollapsed}}">
+                <TextBlock Text="{Binding RecoveryNotice}" Style="{StaticResource Body}"/>
+            </Border>
+            <ContentControl Grid.Row="1" Content="{Binding Nav.Current}" Focusable="False"/>
+        </Grid>
+    </DockPanel>
+</Window>

@@ -1,0 +1,6 @@
+{ "models": [
+  { "ollamaName": "llama3.2:3b", "role": "FastUtility", "notes": "Runs on most laptops, including CPU only." },
+  { "ollamaName": "qwen3:4b", "role": "FastUtility", "notes": "Small general model with tool calling." },
+  { "ollamaName": "gemma3:4b", "role": "FastUtility", "notes": "Small general model; text only." },
+  { "ollamaName": "qwen2.5-coder:7b", "role": "PrimaryCoding", "notes": "The best coding model for 8 GB GPUs." }
+] }

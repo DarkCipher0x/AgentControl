@@ -1,0 +1,14 @@
+# Images a person has looked at (SHA-256, then path). Scans cannot see pixels: a new or changed image stops the release until it is viewed and listed here.
+# 2026-10-21: the AgentControl logo at every size (app-*.png, app.ico frames, app-master.svg), viewed in full; logo artwork only.
+8da68a49f8c986d295c5a41123858d0353baaae6108b719644343eebc680f3ea  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-128.png
+ce332c5043dc9838ba249b6214ba3d1b745888431a6a8f0c7aaf6037196a1cc0  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-16.png
+f3191c686589ae67b3ca637599704163380338fff897caf5fd0c597abcfafa52  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-20.png
+f281b33e3ed845a2a828734e88dd5652eea7df9f5b4d661589f3b7849685dcc0  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-24.png
+db1ef0d44e168b076c9911c17a6de08c3cb98a3edcc4a983a620967ca1a2daea  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-256.png
+7538f130c8adfc01305cd1f3ac31dcdfbbd277d0cc2b7f9bb3ed5b95cc8989e8  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-32.png
+81539feacdfd68cfab682fc07f083cacaa461a19fb458a65306d997fbdf4e2f1  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-40.png
+1560a6c6d2b46455d7ee79a5d51ffe66b2d1c7ed441f9d6eb566658e36b94e28  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-48.png
+5dc04192060c8e51fc12ba24b0232074fcbbfa31605f3be0b1a97c9773b16642  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-512.png
+e57bebda7425a458cdff0ac206f37f462f8238503caf04dde1dcdaedb922e5fc  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-64.png
+474b05db7d7d45da61189bc940ec04833a2e580ca83a30eb4f599607d935ec54  src/DarkCipher.AgentControl.App/Assets/AppIcon/app-master.svg
+82cec82527aed403d8130d9f55695f390a1b16fca607b7f3a728cbc4807fd317  src/DarkCipher.AgentControl.App/Assets/AppIcon/app.ico

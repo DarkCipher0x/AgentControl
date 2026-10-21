@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <NoWarn>$(NoWarn);CA1707;CA1515;CA2234;CA1849;CA5351;xUnit1031</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Domain\DarkCipher.AgentControl.Domain.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Application\DarkCipher.AgentControl.Application.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Security\DarkCipher.AgentControl.Security.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Infrastructure\DarkCipher.AgentControl.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Integrations\DarkCipher.AgentControl.Integrations.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Extensions\DarkCipher.AgentControl.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Sdk\DarkCipher.AgentControl.Sdk.csproj" />
+    <!-- Build order only: code-extension tests load the compiled samples through the real extension host. -->
+    <ProjectReference Include="..\..\samples\dashboard-panel\ModelPanel.csproj" ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\..\samples\agent-detector\AgentDetector.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+</Project>

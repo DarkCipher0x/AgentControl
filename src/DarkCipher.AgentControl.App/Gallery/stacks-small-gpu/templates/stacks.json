@@ -1,0 +1,6 @@
+[
+  { "Id": "gallery-small-coder", "Name": "8 GB GPU - Codex + qwen2.5-coder 7B", "Description": "The strongest coding model that fits fully in 8 GB of GPU memory at 16K context.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen2.5-coder:7b", "UtilityModel": "qwen3:4b", "ContextLength": 16384 },
+  { "Id": "gallery-small-laptop", "Name": "Laptop - Codex + llama3.2 3B", "Description": "Runs on most laptops, including CPU only. Good for small edits and explanations; not for large refactors.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "llama3.2:3b", "UtilityModel": null, "ContextLength": 16384 }
+]

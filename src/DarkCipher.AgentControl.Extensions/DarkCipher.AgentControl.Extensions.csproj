@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Extension platform: manifest validation, safe package install, lifecycle host, SdkCapabilityBroker. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkCipher.AgentControl.Sdk\DarkCipher.AgentControl.Sdk.csproj" />
+    <ProjectReference Include="..\DarkCipher.AgentControl.Domain\DarkCipher.AgentControl.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DarkCipher.AgentControl.Tests" />
+  </ItemGroup>
+</Project>

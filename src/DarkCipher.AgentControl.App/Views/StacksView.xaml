@@ -1,0 +1,144 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.StacksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <DockPanel Margin="{DynamicResource PageMargin}">
+        <DockPanel DockPanel.Dock="Top">
+            <Button DockPanel.Dock="Right" Content="Import…" Command="{Binding ImportCommand}" VerticalAlignment="Top"/>
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        </DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <Grid>
+            <Grid.ColumnDefinitions><ColumnDefinition Width="380"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+            <ListBox ItemsSource="{Binding Stacks}" SelectedItem="{Binding Selected}" shell:ContextMenus.Provider="{Binding}" Margin="0,0,12,0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,5">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}"/>
+                                <Border Style="{StaticResource Badge}" Margin="8,0,0,0" Visibility="{Binding BuiltIn, Converter={StaticResource BoolToVis}}"><TextBlock Text="TEMPLATE" FontSize="{DynamicResource FsCaption}" Foreground="{DynamicResource Muted}"/></Border>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MutedText}"><Run Text="{Binding AgentProviderId, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding AgentMode, Mode=OneWay}"/><Run Text=" · "/><Run Text="{Binding PrimaryModel, Mode=OneWay}"/></TextBlock>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Selected.Name}" Style="{StaticResource H2}"/>
+                            <TextBlock Text="{Binding Selected.Description}" Style="{StaticResource Body}" Margin="0,0,0,10"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="160"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                                <TextBlock Text="AGENT / MODE" Style="{StaticResource Label}"/>
+                                <TextBlock Grid.Column="1" Style="{StaticResource Body}"><Run Text="{Binding Selected.AgentProviderId, Mode=OneWay}"/><Run Text=" — "/><Run Text="{Binding Selected.AgentMode, Mode=OneWay}"/></TextBlock>
+                                <TextBlock Grid.Row="1" Text="RUNTIME / ENDPOINT" Style="{StaticResource Label}"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Style="{StaticResource Mono}"><Run Text="{Binding Selected.RuntimeId, Mode=OneWay}"/><Run Text="  "/><Run Text="{Binding Selected.Endpoint, Mode=OneWay}"/></TextBlock>
+                                <TextBlock Grid.Row="2" Text="UTILITY MODEL" Style="{StaticResource Label}"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Selected.UtilityModel}" Style="{StaticResource Mono}"/>
+                                <TextBlock Grid.Row="3" Text="SOURCE" Style="{StaticResource Label}"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Selected.TemplateSource}" Style="{StaticResource MutedText}"/>
+                            </Grid>
+                            <WrapPanel Margin="0,12,0,0">
+                                <Button Content="Test readiness" Style="{StaticResource PrimaryButton}" Command="{Binding TestCommand}"/>
+                                <Button Content="Diagnose" Command="{Binding RepairCommand}" ToolTip="Finds what is wrong and proposes minimal fixes. Changes nothing."/>
+                                <Button Content="Run full verification" Command="{Binding VerifyCommand}" ToolTip="Readiness, model tests, generated configuration and a safe end-to-end test in a disposable project."/>
+                                <Button Content="Roll back last change" Command="{Binding RollbackCommand}" ToolTip="Restores the previous version of this stack's agent profile file."/>
+                                <Button Content="Launch…" Command="{Binding LaunchCommand}"/>
+                                <Button Content="Duplicate" Command="{Binding DuplicateCommand}"/>
+                                <Button Content="Export" Command="{Binding ExportCommand}"/>
+                                <Button Content="Delete" Style="{StaticResource DangerButton}" Command="{Binding DeleteCommand}"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}" Visibility="{Binding CanEdit, Converter={StaticResource BoolToVis}}">
+                        <StackPanel MaxWidth="560" HorizontalAlignment="Left">
+                            <TextBlock Text="Edit" Style="{StaticResource H2}"/>
+                            <TextBlock Text="NAME" Style="{StaticResource Label}"/>
+                            <TextBox Text="{Binding EditName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8"/>
+                            <TextBlock Text="PRIMARY MODEL" Style="{StaticResource Label}"/>
+                            <TextBox Text="{Binding EditModel, UpdateSourceTrigger=PropertyChanged}" FontFamily="{DynamicResource MonoFont}" Margin="0,0,0,8"/>
+                            <TextBlock Text="CONTEXT (tokens)" Style="{StaticResource Label}"/>
+                            <TextBox Text="{Binding EditContext, UpdateSourceTrigger=PropertyChanged}" Width="160" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                            <TextBlock Text="PERMISSIONS" Style="{StaticResource Label}"/>
+                            <ComboBox ItemsSource="{Binding PermissionProfiles}" SelectedItem="{Binding EditPermission}" DisplayMemberPath="Name" Margin="0,0,0,8"/>
+                            <TextBlock Text="PRIVACY" Style="{StaticResource Label}"/>
+                            <ComboBox ItemsSource="{Binding PrivacyModes}" SelectedItem="{Binding EditPrivacy}" Margin="0,0,0,12"/>
+                            <Button Content="Save" Style="{StaticResource PrimaryButton}" Command="{Binding SaveCommand}" HorizontalAlignment="Left"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="Readiness" Style="{StaticResource H2}"/>
+                                <TextBlock Text="{Binding ReadinessText}" Foreground="{DynamicResource Accent}" Margin="12,2,0,0" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <DataGrid ItemsSource="{Binding Checks}" MaxHeight="300">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="CHECK" Binding="{Binding Name}" Width="160"/>
+                                    <DataGridCheckBoxColumn Header="OK" Binding="{Binding Passed}" Width="40"/>
+                                    <DataGridTextColumn Header="SEVERITY" Binding="{Binding Severity}" Width="80"/>
+                                    <DataGridTextColumn Header="DETAIL" Binding="{Binding Detail}" Width="*">
+                                        <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style></DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                            <ItemsControl ItemsSource="{Binding Findings}" Margin="0,10,0,0">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Style="{StaticResource Notice}" BorderBrush="{DynamicResource Warn}">
+                                            <DockPanel>
+                                                <Button DockPanel.Dock="Right" Content="Do this" VerticalAlignment="Top"
+                                                        Command="{Binding DataContext.FixCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Issue}" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                                                    <TextBlock Text="{Binding Evidence, StringFormat=Evidence: {0}}" Style="{StaticResource MutedText}"/>
+                                                    <TextBlock Text="{Binding ProposedCorrection, StringFormat=Proposed: {0}}" Style="{StaticResource Body}"/>
+                                                    <TextBlock Style="{StaticResource Caption}" TextWrapping="Wrap">
+                                                        <Run Text="Privileges: "/><Run Text="{Binding PrivilegesRequired, Mode=OneWay}"/><Run Text="  ·  Rollback: "/><Run Text="{Binding Rollback, Mode=OneWay}"/><Run Text="  ·  Validation: "/><Run Text="{Binding Validation, Mode=OneWay}"/>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </DockPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource Card}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="End-to-end verification" Style="{StaticResource H2}"/>
+                                <TextBlock Text="{Binding VerificationLabel}" Foreground="{DynamicResource Accent}" Margin="12,2,0,0" FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <TextBlock Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="&quot;Supported and Verified&quot; is shown only when every requirement is proven AND the agent answered a fixed prompt in a disposable project. Anything less gets a weaker, exact label."/>
+                            <ItemsControl ItemsSource="{Binding VerificationSteps}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <DockPanel Margin="0,2">
+                                            <TextBlock DockPanel.Dock="Left" Width="22" FontWeight="SemiBold">
+                                                <TextBlock.Style>
+                                                    <Style TargetType="TextBlock">
+                                                        <Setter Property="Text" Value="✗"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource Bad}"/>
+                                                        <Style.Triggers><DataTrigger Binding="{Binding Ok}" Value="True"><Setter Property="Text" Value="✓"/><Setter Property="Foreground" Value="{DynamicResource Good}"/></DataTrigger></Style.Triggers>
+                                                    </Style>
+                                                </TextBlock.Style>
+                                            </TextBlock>
+                                            <TextBlock DockPanel.Dock="Left" Text="{Binding Name}" Width="200" Style="{StaticResource Body}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                                        </DockPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</UserControl>

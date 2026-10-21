@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- dcx-ext: extension developer tooling (new, validate, analyse, check-compat, pack). Uses the host's own validator. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <AssemblyName>dcx-ext</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Extensions\DarkCipher.AgentControl.Extensions.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Security\DarkCipher.AgentControl.Security.csproj" />
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Sdk\DarkCipher.AgentControl.Sdk.csproj" />
+  </ItemGroup>
+</Project>

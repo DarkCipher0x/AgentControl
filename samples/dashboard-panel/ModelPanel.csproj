@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Code extension sample. References ONLY the public SDK, which the host supplies at run time (Private=false). -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <AssemblyName>ModelPanel</AssemblyName>
+    <RootNamespace>Sample.ModelPanel</RootNamespace>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\DarkCipher.AgentControl.Sdk\DarkCipher.AgentControl.Sdk.csproj" Private="false" ExcludeAssets="runtime" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="extension.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

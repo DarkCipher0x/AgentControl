@@ -1,0 +1,14 @@
+# Files that exist in the project but are never published. Same pattern rules as public-allowlist.txt.
+# The maintainer's working notes and verbatim internal specs (they name people and local folders)
+RESUME.md
+docs/specs/**
+# The local term list for the privacy scan (names that must never appear in public files)
+*.local.txt
+tools/*.local.txt
+# The pinned gitleaks binary (tools\release\get-gitleaks.ps1 downloads it)
+tools/bin/**
+# Signing material and packages, should any ever be made here
+**/*.pfx
+**/*.cer
+**/*.snk
+**/*.msix

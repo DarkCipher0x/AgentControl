@@ -1,0 +1,147 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.CatalogueView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <UserControl.Resources>
+        <Style x:Key="ToolList" TargetType="ItemsControl">
+            <Setter Property="ItemTemplate" Value="{StaticResource ToolCard}"/>
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="shell:ContextMenus.Provider" Value="{Binding}"/>
+        </Style>
+    </UserControl.Resources>
+
+    <DockPanel Margin="{DynamicResource PageMargin}">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                <Grid Width="220" Margin="0,0,8,0">
+                    <TextBox x:Name="SearchBox" Text="{Binding Search, UpdateSourceTrigger=PropertyChanged, Delay=200}" VerticalContentAlignment="Center"
+                             AutomationProperties.Name="Search the catalogue" ToolTip="Search by name, publisher, description or winget id"/>
+                    <TextBlock Text="Search tools…" Style="{StaticResource MutedText}" IsHitTestVisible="False" VerticalAlignment="Center" Margin="10,0,0,0"
+                               Visibility="{Binding Text.Length, ElementName=SearchBox, Converter={StaticResource ZeroToVisible}}"/>
+                </Grid>
+                <Button Content="Check for updates" Command="{Binding CheckUpdatesCommand}" ToolTip="Asks winget for the newest version of each installed tool."/>
+                <Button Content="Refresh" Command="{Binding RefreshCommand}"/>
+            </StackPanel>
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        </DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <ProgressBar DockPanel.Dock="Top" IsIndeterminate="{Binding Busy}" Visibility="{Binding Busy, Converter={StaticResource BoolToVis}}" Margin="0,0,0,8"/>
+        <TextBlock DockPanel.Dock="Top" Text="{Binding Counts}" Style="{StaticResource Caption}" Margin="0,0,0,6"/>
+        <TabControl>
+            <TabItem Header="Available">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Everything in the catalogue that is not installed yet. Install opens the full plan first; the item is Ready only after its post-install test."/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Available}" Style="{StaticResource ToolList}"/></ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Agent tools">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding AgentTools}" Style="{StaticResource ToolList}"/></ScrollViewer>
+            </TabItem>
+            <TabItem Header="Model runtimes">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Runtimes}" Style="{StaticResource ToolList}"/></ScrollViewer>
+            </TabItem>
+            <TabItem Header="Gateways">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Gateways}" Style="{StaticResource ToolList}"/></ScrollViewer>
+            </TabItem>
+            <TabItem Header="Supporting tools">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Tools that coding agents call while they work: Git, Node.js, Python, uv, ripgrep, fd, jq and the GitHub CLI."/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding SupportingTools}" Style="{StaticResource ToolList}"/></ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Models">
+                <Border Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="Models" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Style="{StaticResource Body}" Margin="0,0,0,10" Text="Browse the curated Ollama library, pull any tag, and search Hugging Face GGUF repositories on the Models page. Every download shows a 10-step plan first and is only marked Ready after the runtime lists it and (if you choose) the compatibility suite passes."/>
+                        <Button Content="Open Models" Style="{StaticResource PrimaryButton}" Command="{Binding GoModelsCommand}" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Templates">
+                <Border Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="Templates" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Text="{Binding TemplateSummary}" Style="{StaticResource Body}" Margin="0,0,0,10"/>
+                        <Button Content="Open Templates" Style="{StaticResource PrimaryButton}" Command="{Binding GoTemplatesCommand}" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Extensions">
+                <Border Style="{StaticResource Card}" VerticalAlignment="Top">
+                    <StackPanel>
+                        <TextBlock Text="Extensions" Style="{StaticResource CardTitle}"/>
+                        <TextBlock Style="{StaticResource Body}" Margin="0,0,0,10" Text="Extensions can add templates, catalogue entries, model sources, compatibility rules, health checks, settings and dashboard panels (SDK 1.1). Entries they add are shown here as Unverified and are installed only by this app's winget path after your approval."/>
+                        <Button Content="Open Extensions" Command="{Binding GoExtensionsCommand}" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+            </TabItem>
+            <TabItem Header="Installed">
+                <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Installed}" Style="{StaticResource ToolList}"/></ScrollViewer>
+            </TabItem>
+            <TabItem Header="Updates">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Use 'Check for updates' to ask winget for the newest versions. An update keeps your settings; its plan names the rollback."/>
+                    <ScrollViewer VerticalScrollBarVisibility="Auto"><ItemsControl ItemsSource="{Binding Updates}" Style="{StaticResource ToolList}"/></ScrollViewer>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Downloads">
+                <DockPanel>
+                    <Button DockPanel.Dock="Top" Content="Open the download and installation manager" Command="{Binding GoDownloadsCommand}" HorizontalAlignment="Left" Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding Queue}" Focusable="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,6">
+                                    <DockPanel>
+                                        <TextBlock DockPanel.Dock="Right" Text="{Binding StageLabel}" Foreground="{DynamicResource Accent}" FontWeight="SemiBold"/>
+                                        <TextBlock Text="{Binding Request.DisplayName}" Style="{StaticResource Body}" FontWeight="SemiBold" Width="320"/>
+                                        <TextBlock Text="{Binding Status}" Style="{StaticResource MutedText}"/>
+                                    </DockPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Custom tools" Visibility="{Binding ShowAdvanced, Converter={StaticResource BoolToVis}}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <Border Style="{StaticResource Notice}" BorderBrush="{DynamicResource Warn}">
+                            <TextBlock Style="{StaticResource Body}" Text="Advanced. A custom tool is any agent CLI you installed yourself. It starts Unverified; its validation runs the version command through the secure executor (full path, .exe only, no shell). Templates accept it only after validation. Permission profiles are advisory for custom tools."/>
+                        </Border>
+                        <Border Style="{StaticResource Card}">
+                            <StackPanel MaxWidth="640" HorizontalAlignment="Left">
+                                <TextBlock Text="Register a custom tool" Style="{StaticResource CardTitle}"/>
+                                <TextBlock Text="DISPLAY NAME" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding CustomName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,8" AutomationProperties.Name="Custom tool display name"/>
+                                <TextBlock Text="EXECUTABLE (full path to an .exe)" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding CustomExecutable, UpdateSourceTrigger=PropertyChanged}" FontFamily="{DynamicResource MonoFont}" Margin="0,0,0,8" AutomationProperties.Name="Custom tool executable path"/>
+                                <TextBlock Text="VERSION ARGUMENTS" Style="{StaticResource Label}"/>
+                                <TextBox Text="{Binding CustomVersionArgs, UpdateSourceTrigger=PropertyChanged}" FontFamily="{DynamicResource MonoFont}" Width="200" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                                <Button Content="Register (Unverified)" Command="{Binding RegisterCustomCommand}" HorizontalAlignment="Left"/>
+                            </StackPanel>
+                        </Border>
+                        <ItemsControl ItemsSource="{Binding CustomTools}" Focusable="False" shell:ContextMenus.Provider="{Binding}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Style="{StaticResource Card}" Margin="0,0,0,8">
+                                        <DockPanel>
+                                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                                                <Button Content="Run validation" Command="{Binding DataContext.ValidateCustomCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                                <Button Content="Remove" Style="{StaticResource DangerButton}" Command="{Binding DataContext.RemoveCustomCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"/>
+                                            </StackPanel>
+                                            <StackPanel>
+                                                <TextBlock Text="{Binding Name}" Style="{StaticResource CardTitle}"/>
+                                                <TextBlock Style="{StaticResource BodySecondary}"><Run Text="{Binding Trust, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Summary, Mode=OneWay}"/></TextBlock>
+                                            </StackPanel>
+                                        </DockPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

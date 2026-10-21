@@ -1,0 +1,141 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell"
+                    xmlns:vm="clr-namespace:DarkCipher.AgentControl.App.ViewModels"
+                    xmlns:v="clr-namespace:DarkCipher.AgentControl.App.Views">
+    <shell:BoolToVisibilityConverter x:Key="BoolToVis"/>
+    <shell:BoolToVisibilityConverter x:Key="BoolToVisInverted" Invert="True"/>
+    <shell:NullToCollapsedConverter x:Key="NullToCollapsed"/>
+    <shell:BytesConverter x:Key="Bytes"/>
+    <shell:AllTrueToVisibilityConverter x:Key="AllTrueToVis"/>
+    <shell:ZeroToVisibleConverter x:Key="ZeroToVisible"/>
+
+    <!-- Brand mark: the application icon as vector art (the 32-48 px detail level of tools/DarkCipher.AgentControl.IconBuilder),
+         in the fixed brand colours so it matches the exe/taskbar icon under every theme. Design space 256 x 256. -->
+    <ControlTemplate x:Key="BrandMark" TargetType="ContentControl">
+        <Viewbox>
+            <Canvas Width="256" Height="256">
+                <Path Data="M128,13 L227.59,70.5 L227.59,185.5 L128,243 L28.41,185.5 L28.41,70.5 Z" Fill="{StaticResource MarkPanel}" Stroke="{StaticResource MarkTeal}" StrokeThickness="14" StrokeLineJoin="Round"/>
+                <Path Data="M178.43,167.4 A64,64 0 1 1 178.43,88.6" Stroke="{StaticResource MarkTeal}" StrokeThickness="20" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                <Ellipse Canvas.Left="111" Canvas.Top="47" Width="34" Height="34" Fill="{StaticResource MarkTeal}"/>
+                <Ellipse Canvas.Left="47" Canvas.Top="111" Width="34" Height="34" Fill="{StaticResource MarkTeal}"/>
+                <Ellipse Canvas.Left="111" Canvas.Top="175" Width="34" Height="34" Fill="{StaticResource MarkTeal}"/>
+                <Ellipse Canvas.Left="109" Canvas.Top="109" Width="38" Height="38" Fill="{StaticResource MarkCore}" Stroke="{StaticResource MarkTeal}" StrokeThickness="5"/>
+            </Canvas>
+        </Viewbox>
+    </ControlTemplate>
+
+    <!-- Page header used by every screen -->
+    <DataTemplate x:Key="PageHeader">
+        <StackPanel Margin="0,0,0,14">
+            <TextBlock Text="{Binding Title}" Style="{StaticResource H1}"/>
+            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource MutedText}" Margin="0,2,0,0"/>
+        </StackPanel>
+    </DataTemplate>
+
+    <!-- One catalogue tool (ToolRowViewModel): what it is, where it comes from, what is installed, what this app has
+         verified, and what you can do. Commands live on the row, so the card works on any page. Right-click for more. -->
+    <DataTemplate x:Key="ToolCard">
+        <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Width="170" Margin="12,0,0,0">
+                    <Button Content="{Binding InstallLabel}" Style="{StaticResource PrimaryButton}" Margin="0,0,0,6" Command="{Binding InstallCommand}"
+                            Visibility="{Binding CanInstall, Converter={StaticResource BoolToVis}}" AutomationProperties.Name="{Binding Name, StringFormat=Install {0}}"/>
+                    <Button Content="Update…" Margin="0,0,0,6" Command="{Binding UpdateCommand}"
+                            Visibility="{Binding CanUpdate, Converter={StaticResource BoolToVis}}" AutomationProperties.Name="{Binding Name, StringFormat=Update {0}}"/>
+                    <Button Content="Diagnose / repair…" Margin="0,0,0,6" Command="{Binding RepairCommand}"
+                            Visibility="{Binding CanRepair, Converter={StaticResource BoolToVis}}" ToolTip="Diagnoses first; offers a repair only when something is actually wrong."/>
+                    <Button Content="View plan" Margin="0,0,0,6" Command="{Binding PlanCommand}"
+                            Visibility="{Binding CanInstall, Converter={StaticResource BoolToVis}}" ToolTip="Shows the full installation plan without doing anything."/>
+                    <Button Content="Uninstall…" Style="{StaticResource DangerButton}" Margin="0,0,0,6" Command="{Binding UninstallCommand}"
+                            Visibility="{Binding CanUninstall, Converter={StaticResource BoolToVis}}" AutomationProperties.Name="{Binding Name, StringFormat=Uninstall {0}}"/>
+                </StackPanel>
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}" Style="{StaticResource CardTitle}" Margin="0,0,10,4"/>
+                        <Border Style="{StaticResource Badge}" BorderBrush="{Binding StateBrush}" Background="Transparent">
+                            <TextBlock Text="{Binding State}" Foreground="{Binding StateBrush}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/>
+                        </Border>
+                        <Border Style="{StaticResource Badge}"><TextBlock Text="{Binding Kind}" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/></Border>
+                        <Border Style="{StaticResource Badge}" Visibility="{Binding CatalogueOnly, Converter={StaticResource BoolToVis}}"
+                                ToolTip="This app installs, updates, detects and removes it. No stack or session provider uses it yet.">
+                            <TextBlock Text="Catalogue only" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/>
+                        </Border>
+                        <Border Style="{StaticResource Badge}" Visibility="{Binding PartOfLabel, Converter={StaticResource NullToCollapsed}}">
+                            <TextBlock Text="{Binding PartOfLabel}" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/>
+                        </Border>
+                    </WrapPanel>
+                    <TextBlock Text="{Binding Description}" Style="{StaticResource Body}" Margin="0,0,0,8"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions><ColumnDefinition Width="150"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/><RowDefinition/></Grid.RowDefinitions>
+                        <TextBlock Text="PUBLISHER" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Column="1" Text="{Binding Publisher}" Style="{StaticResource Body}"/>
+                        <TextBlock Grid.Row="1" Text="SOURCE" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Source}" Style="{StaticResource Code}"/>
+                        <TextBlock Grid.Row="2" Text="LICENCE" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Licence}" Style="{StaticResource Body}"/>
+                        <TextBlock Grid.Row="3" Text="VERSION" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Row="3" Grid.Column="1" Style="{StaticResource Body}">
+                            <Run Text="Installed "/><Run Text="{Binding InstalledVersion, Mode=OneWay}" FontWeight="SemiBold"/>
+                            <Run Text="  ·  available "/><Run Text="{Binding AvailableVersion, Mode=OneWay}"/>
+                            <Run Text="  ·  verified by this app "/><Run Text="{Binding VerifiedVersion, Mode=OneWay}"/>
+                        </TextBlock>
+                        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding VersionVerdict}" Style="{StaticResource Caption}" Foreground="{DynamicResource Warn}"
+                                   Visibility="{Binding VersionVerdict, Converter={StaticResource NullToCollapsed}}"/>
+                        <TextBlock Grid.Row="5" Text="PROTOCOLS" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding Protocols}" Style="{StaticResource Body}"/>
+                        <TextBlock Grid.Row="6" Text="STATUS" Style="{StaticResource Label}"/>
+                        <TextBlock Grid.Row="6" Grid.Column="1" Style="{StaticResource BodySecondary}"><Run Text="{Binding Summary, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding Trust, Mode=OneWay}"/><Run Text="  ·  "/><Run Text="{Binding CheckedAt, Mode=OneWay}"/></TextBlock>
+                    </Grid>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </DataTemplate>
+
+    <!-- Compact tool row for category pages (Agents, Services): name, state, one-line status and the main action. -->
+    <DataTemplate x:Key="ToolRowCompact">
+        <Border BorderBrush="{DynamicResource Line}" BorderThickness="0,0,0,1" Padding="0,8" Background="Transparent">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Content="{Binding InstallLabel}" Style="{StaticResource PrimaryButton}" Command="{Binding InstallCommand}"
+                            Visibility="{Binding CanInstall, Converter={StaticResource BoolToVis}}" AutomationProperties.Name="{Binding Name, StringFormat=Install {0}}"/>
+                    <Button Content="Update…" Command="{Binding UpdateCommand}" Visibility="{Binding CanUpdate, Converter={StaticResource BoolToVis}}"/>
+                    <Button Content="Details" Command="{Binding DetailsCommand}"/>
+                </StackPanel>
+                <StackPanel>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                        <Border Style="{StaticResource Badge}" BorderBrush="{Binding StateBrush}" Background="Transparent">
+                            <TextBlock Text="{Binding State}" Foreground="{Binding StateBrush}" FontSize="{DynamicResource FsCaption}" FontWeight="SemiBold"/>
+                        </Border>
+                        <Border Style="{StaticResource Badge}" Visibility="{Binding CatalogueOnly, Converter={StaticResource BoolToVis}}">
+                            <TextBlock Text="Catalogue only" Foreground="{DynamicResource Muted}" FontSize="{DynamicResource FsCaption}"/>
+                        </Border>
+                    </WrapPanel>
+                    <TextBlock Text="{Binding Description}" Style="{StaticResource MutedText}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Summary}" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </DataTemplate>
+
+    <!-- View model → view -->
+    <DataTemplate DataType="{x:Type vm:DashboardViewModel}"><v:DashboardView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SetupViewModel}"><v:SetupView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:CatalogueViewModel}"><v:CatalogueView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:TemplatesViewModel}"><v:TemplatesView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:AgentsViewModel}"><v:AgentsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ModelsViewModel}"><v:ModelsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:StacksViewModel}"><v:StacksView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ProjectsViewModel}"><v:ProjectsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SessionsViewModel}"><v:SessionsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ServicesViewModel}"><v:ServicesView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:HardwareViewModel}"><v:HardwareView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DownloadsViewModel}"><v:DownloadsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:ExtensionsViewModel}"><v:ExtensionsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:DeveloperViewModel}"><v:DeveloperView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SecurityViewModel}"><v:SecurityView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:LogsViewModel}"><v:LogsView/></DataTemplate>
+    <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><v:SettingsView/></DataTemplate>
+</ResourceDictionary>

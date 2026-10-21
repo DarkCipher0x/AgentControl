@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Integration adapters (Ollama, Hugging Face, Claude Code, Codex). Reach the outside world only through Domain ports
+       (INetworkClient, IProcessExecutor, ICredentialStore, IAuditLogger) which the Security assembly implements. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DarkCipher.AgentControl.Domain\DarkCipher.AgentControl.Domain.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="DarkCipher.AgentControl.Tests" />
+  </ItemGroup>
+</Project>

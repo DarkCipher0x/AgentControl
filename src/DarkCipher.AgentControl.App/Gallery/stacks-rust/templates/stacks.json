@@ -1,0 +1,6 @@
+[
+  { "Id": "gallery-rust-codex", "Name": "Rust - Codex + Ollama", "Description": "Codex with a coding model and a 32K context for Cargo workspaces.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen2.5-coder:14b", "UtilityModel": "qwen2.5-coder:7b", "ContextLength": 32768 },
+  { "Id": "gallery-rust-review", "Name": "Rust - unsafe and lifetimes review", "Description": "Local read-only review of unsafe blocks, lifetimes and error handling.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "devstral:24b", "UtilityModel": null, "ContextLength": 32768 }
+]

@@ -1,0 +1,43 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.HardwareView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,18,12,18">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="Rescan" Command="{Binding RescanCommand}" VerticalAlignment="Top"/>
+                <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+            </DockPanel>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="{Binding Headline}" Style="{StaticResource Value}" Foreground="{DynamicResource Accent}"/>
+                    <TextBlock Text="Why this recommendation?" Style="{StaticResource Label}" Margin="0,10,0,4"/>
+                    <ItemsControl ItemsSource="{Binding Reasons}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=· {0}}" Style="{StaticResource Body}" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Detected hardware" Style="{StaticResource H2}"/>
+                    <DataGrid ItemsSource="{Binding Facts}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ITEM" Binding="{Binding Label}" Width="170"/>
+                            <DataGridTextColumn Header="STATE" Binding="{Binding State}" Width="100"/>
+                            <DataGridTextColumn Header="DETAIL" Binding="{Binding Value}" Width="*">
+                                <DataGridTextColumn.ElementStyle><Style TargetType="TextBlock"><Setter Property="TextWrapping" Value="Wrap"/></Style></DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource Card}">
+                <StackPanel>
+                    <TextBlock Text="Memory budget used for recommendations" Style="{StaticResource H2}"/>
+                    <ItemsControl ItemsSource="{Binding Budget}">
+                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=· {0}}" Style="{StaticResource Body}" Margin="0,2"/></DataTemplate></ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

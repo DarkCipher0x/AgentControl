@@ -1,0 +1,20 @@
+{
+  "id": "darkcipher.gallery.models-lightweight",
+  "name": "Lightweight model shortlist",
+  "publisher": "DarkCipher Systems",
+  "version": "1.0.0",
+  "description": "Data only: small models for laptops, CPU-only PCs and 4-8 GB GPUs (metadata only; nothing is downloaded by the extension).",
+  "minAppVersion": "0.1.9",
+  "maxTestedVersion": "0.1.9",
+  "sdkVersion": "1.1.0",
+  "entryPoint": null,
+  "types": ["ModelSource"],
+  "permissions": [],
+  "requiredServices": [],
+  "networkEndpoints": [],
+  "dependencies": [],
+  "license": "MIT",
+  "source": null,
+  "signature": null,
+  "contributes": { "stackTemplates": [], "modelCatalogs": ["catalogs/models.json"] }
+}

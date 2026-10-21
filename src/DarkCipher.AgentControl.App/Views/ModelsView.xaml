@@ -1,0 +1,209 @@
+<UserControl x:Class="DarkCipher.AgentControl.App.Views.ModelsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:shell="clr-namespace:DarkCipher.AgentControl.App.Shell">
+    <DockPanel Margin="24,18,24,18">
+        <DockPanel DockPanel.Dock="Top">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+                <Button Content="Downloads" Command="{Binding OpenDownloadsCommand}"/>
+                <Button Content="Refresh" Command="{Binding RefreshCommand}"/>
+            </StackPanel>
+            <ContentPresenter Content="{Binding}" ContentTemplate="{StaticResource PageHeader}"/>
+        </DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Text="{Binding Message}" Style="{StaticResource MutedText}" Margin="0,8,0,0"/>
+        <!-- Downloads that still need attention: running, paused, interrupted or failed. Resume and Retry continue from the
+             layers Ollama already has. -->
+        <Border DockPanel.Dock="Top" Style="{StaticResource Notice}" BorderBrush="{DynamicResource AccentDim}" Visibility="{Binding HasPending, Converter={StaticResource BoolToVis}}">
+            <StackPanel>
+                <TextBlock Text="Model downloads in progress or unfinished" Style="{StaticResource CardTitle}" Margin="0,0,0,4"/>
+                <ItemsControl ItemsSource="{Binding Pending}" Focusable="False" shell:ContextMenus.Provider="{Binding}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel Margin="0,3" Background="Transparent">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                                    <Button Content="Resume" Command="{Binding DataContext.ResumeJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            Visibility="{Binding IsPaused, Converter={StaticResource BoolToVis}}"/>
+                                    <Button Content="Retry" Style="{StaticResource PrimaryButton}" Command="{Binding DataContext.RetryJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            Visibility="{Binding IsFailed, Converter={StaticResource BoolToVis}}"/>
+                                    <Button Content="Pause" Command="{Binding DataContext.PauseJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}"/>
+                                    <Button Content="Cancel" Command="{Binding DataContext.CancelJobCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            Visibility="{Binding IsFinished, Converter={StaticResource BoolToVisInverted}}"/>
+                                </StackPanel>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding Request.DisplayName}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}" Width="260" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                <TextBlock DockPanel.Dock="Left" Text="{Binding StageLabel}" Foreground="{DynamicResource Accent}" Width="110" VerticalAlignment="Center"/>
+                                <ProgressBar DockPanel.Dock="Left" Width="160" Height="6" Margin="0,0,10,0" Value="{Binding Percent, Mode=OneWay}" IsIndeterminate="{Binding IsIndeterminate, Mode=OneWay}"
+                                             Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Status}" Style="{StaticResource MutedText}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+        <TabControl>
+            <TabItem Header="Installed">
+                <DockPanel>
+                    <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <Button Content="Test compatibility" Style="{StaticResource PrimaryButton}" Command="{Binding TestCommand}" ToolTip="Runs text, instruction, code, JSON-schema and tool-call tests with fixed prompts on this PC."/>
+                        <Button Content="Test Claude Code gateway" Command="{Binding GatewayTestCommand}" ToolTip="Tests Ollama's Anthropic-compatible endpoint (text + tool use) with this model. Experimental."/>
+                        <Button Content="Details" Command="{Binding DetailsCommand}"/>
+                        <Button Content="Unload" Command="{Binding UnloadCommand}" ToolTip="Free GPU/RAM now (keeps the model installed)."/>
+                        <Button Content="Copy name" Command="{Binding CopyNameCommand}"/>
+                        <Button Content="Remove…" Style="{StaticResource DangerButton}" Command="{Binding RemoveCommand}"/>
+                    </WrapPanel>
+                    <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding LastResults}" Margin="0,10,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,1">
+                                    <TextBlock Text="{Binding Test}" Width="240" Style="{StaticResource Body}"/>
+                                    <TextBlock Text="{Binding Passed}" Width="60" Foreground="{DynamicResource Accent}"/>
+                                    <TextBlock Text="{Binding Detail}" Style="{StaticResource MutedText}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <DataGrid ItemsSource="{Binding Installed}" SelectedItem="{Binding SelectedInstalled}" shell:ContextMenus.Provider="{Binding}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="MODEL" Binding="{Binding Name}" Width="230"/>
+                            <DataGridTextColumn Header="PARAMS" Binding="{Binding Params}" Width="70"/>
+                            <DataGridTextColumn Header="QUANT" Binding="{Binding Quant}" Width="80"/>
+                            <DataGridTextColumn Header="SIZE" Binding="{Binding Size, Converter={StaticResource Bytes}}" Width="80"/>
+                            <DataGridTextColumn Header="CONTEXT" Binding="{Binding Context}" Width="80"/>
+                            <DataGridTextColumn Header="CAPABILITIES" Binding="{Binding Caps}" Width="220"/>
+                            <DataGridTextColumn Header="COMPATIBILITY (this PC)" Binding="{Binding Verdict}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Recommended for this PC">
+                <DockPanel>
+                    <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBlock Text="PROFILE" Style="{StaticResource Label}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox ItemsSource="{Binding Profiles}" SelectedItem="{Binding Profile}" Width="260"/>
+                        <TextBlock Text="Estimates use real memory budgets; speed is only shown after a test on this PC." Style="{StaticResource MutedText}" VerticalAlignment="Center" Margin="12,0,0,0"/>
+                    </StackPanel>
+                    <ListBox ItemsSource="{Binding Recommendations}" shell:ContextMenus.Provider="{Binding}" HorizontalContentAlignment="Stretch">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="0,5">
+                                <StackPanel DockPanel.Dock="Right" Margin="12,0,0,0" VerticalAlignment="Center" Width="150">
+                                    <Button Content="{Binding ActionLabel}" Style="{StaticResource PrimaryButton}" IsEnabled="{Binding CanAct}"
+                                            Command="{Binding DataContext.RowActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                            AutomationProperties.Name="{Binding Name, StringFormat=Download {0}}"/>
+                                    <TextBlock Text="{Binding StateText}" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                </StackPanel>
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Model.DisplayName}" FontWeight="SemiBold" Foreground="{DynamicResource FgStrong}"/>
+                                        <TextBlock Text="{Binding Model.OllamaName}" Style="{StaticResource Mono}" Foreground="{DynamicResource Muted}" Margin="10,0,0,0"/>
+                                        <Border Style="{StaticResource Badge}" Margin="10,0,0,0"><TextBlock Text="{Binding Fit}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                        <Border Style="{StaticResource Badge}" Visibility="{Binding Installed, Converter={StaticResource BoolToVis}}"><TextBlock Text="INSTALLED" Foreground="{DynamicResource Good}" FontSize="{DynamicResource FsCaption}"/></Border>
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding Reason}" Style="{StaticResource MutedText}" MaxWidth="1100" HorizontalAlignment="Left"/>
+                                    <TextBlock Style="{StaticResource MutedText}" FontSize="{DynamicResource FsSmall}">
+                                        <Run Text="Compatible agents: "/><Run Text="{Binding CompatibleAgents, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <ItemsControl ItemsSource="{Binding Limitations}">
+                                        <ItemsControl.ItemTemplate><DataTemplate><TextBlock Text="{Binding StringFormat=· {0}}" Style="{StaticResource MutedText}" FontSize="{DynamicResource FsSmall}"/></DataTemplate></ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Ollama library">
+                <DockPanel>
+                    <WrapPanel DockPanel.Dock="Top" Margin="0,0,0,10">
+                        <TextBox Text="{Binding CatalogFilter, UpdateSourceTrigger=PropertyChanged}" Width="220" Margin="0,0,12,0" ToolTip="Filter by name"/>
+                        <CheckBox Content="Coding" IsChecked="{Binding CodingOnly}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Tool calling" IsChecked="{Binding ToolsOnly}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Fits this PC's GPU" IsChecked="{Binding FitsOnly}" Margin="0,0,12,0"/>
+                        <CheckBox Content="Test for agents after download" IsChecked="{Binding VerifyAfterDownload}" VerticalAlignment="Center" Margin="4,0,16,0"
+                                  ToolTip="Runs the compatibility suite as the Testing stage; the model is marked Ready only if inference, JSON and tool calls pass."/>
+                        <TextBox Text="{Binding PullName, UpdateSourceTrigger=PropertyChanged}" Width="220" Margin="0,0,6,0" AutomationProperties.Name="Model name to download"
+                                 ToolTip="Any Ollama library tag, for example qwen2.5-coder:7b or llama3.2:3b"/>
+                        <Button Content="Download by name…" Command="{Binding PullByNameCommand}" ToolTip="Plans and downloads any Ollama library tag, with the same checks as the list."/>
+                    </WrapPanel>
+                    <TextBlock DockPanel.Dock="Bottom" Style="{StaticResource MutedText}" Margin="0,8,0,0" Text="Curated starting list. Sizes are approximate until Ollama reports them; capabilities are as advertised by the library and are verified only by Test."/>
+                    <DataGrid ItemsSource="{Binding Catalog}" SelectedItem="{Binding SelectedCatalog}" shell:ContextMenus.Provider="{Binding}">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="" Width="110">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="{Binding ActionLabel}" IsEnabled="{Binding CanAct}" Padding="8,2" Margin="0,1"
+                                                Command="{Binding DataContext.RowActionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}"
+                                                AutomationProperties.Name="{Binding Name, StringFormat=Download {0}}"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="MODEL" Binding="{Binding Name}" Width="170"/>
+                            <DataGridTextColumn Header="SIZE" Binding="{Binding Size}" Width="110"/>
+                            <DataGridTextColumn Header="QUANT" Binding="{Binding Model.Quantization}" Width="70"/>
+                            <DataGridTextColumn Header="CONTEXT" Binding="{Binding Context}" Width="80"/>
+                            <DataGridTextColumn Header="CAPABILITIES" Binding="{Binding Caps}" Width="180"/>
+                            <DataGridTextColumn Header="FIT" Binding="{Binding Fit}" Width="120"/>
+                            <DataGridTextColumn Header="STATE" Binding="{Binding StateText, Mode=OneWay}" Width="170"/>
+                            <DataGridTextColumn Header="LICENCE" Binding="{Binding License}" Width="190"/>
+                            <DataGridTextColumn Header="NOTES" Binding="{Binding Model.Notes}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+
+            <TabItem Header="Hugging Face">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                    <DockPanel Margin="0,0,12,0">
+                        <StackPanel DockPanel.Dock="Top">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBox Text="{Binding HfQuery, UpdateSourceTrigger=PropertyChanged}" Width="280" Margin="0,0,8,0"/>
+                                <CheckBox Content="GGUF only" IsChecked="{Binding GgufOnly}" Margin="0,0,8,0"/>
+                                <Button Content="Search" Style="{StaticResource PrimaryButton}" Command="{Binding HfSearchCommand}"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding HfEndpointNote}" Style="{StaticResource MutedText}" Margin="0,0,0,8"/>
+                        </StackPanel>
+                        <DataGrid ItemsSource="{Binding HfResults}" SelectedItem="{Binding SelectedHf}" shell:ContextMenus.Provider="{Binding}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="REPOSITORY" Binding="{Binding Id}" Width="*"/>
+                                <DataGridTextColumn Header="DOWNLOADS" Binding="{Binding Downloads, StringFormat=N0}" Width="90"/>
+                                <DataGridTextColumn Header="LICENCE" Binding="{Binding LicenseName}" Width="100"/>
+                                <DataGridCheckBoxColumn Header="GATED" Binding="{Binding Gated}" Width="60"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </DockPanel>
+                    <DockPanel Grid.Column="1">
+                        <Button DockPanel.Dock="Bottom" Content="Import through Ollama…" Style="{StaticResource PrimaryButton}" Command="{Binding HfImportCommand}" HorizontalAlignment="Left" Margin="0,8,0,0"/>
+                        <Border Style="{StaticResource Card}" Margin="0">
+                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                <TextBlock Text="{Binding HfDetails}" Style="{StaticResource Mono}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </DockPanel>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="Compatibility matrix">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Top" Style="{StaticResource MutedText}" Margin="0,0,0,8" Text="Results come only from tests run on this PC against the exact model digest. NotRun means nobody has tested it — not that it works."/>
+                    <DataGrid ItemsSource="{Binding Matrix}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="AGENT" Binding="{Binding Agent}" Width="200"/>
+                            <DataGridTextColumn Header="RUNTIME" Binding="{Binding Runtime}" Width="100"/>
+                            <DataGridTextColumn Header="PROTOCOL" Binding="{Binding Protocol}" Width="150"/>
+                            <DataGridTextColumn Header="MODEL" Binding="{Binding Model}" Width="170"/>
+                            <DataGridTextColumn Header="NEEDS" Binding="{Binding RequiredCapabilities}" Width="70"/>
+                            <DataGridTextColumn Header="CONTEXT" Binding="{Binding RequiredContext, StringFormat=N0}" Width="70"/>
+                            <DataGridTextColumn Header="RESULT" Binding="{Binding Result}" Width="140"/>
+                            <DataGridTextColumn Header="NOTE" Binding="{Binding Note}" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</UserControl>

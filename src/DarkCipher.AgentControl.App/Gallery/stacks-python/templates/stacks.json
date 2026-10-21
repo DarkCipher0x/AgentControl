@@ -1,0 +1,6 @@
+[
+  { "Id": "gallery-python-codex", "Name": "Python - Codex + Ollama", "Description": "Codex with a coding model and a 32K context for Python packages, scripts and notebooks-as-code.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen2.5-coder:14b", "UtilityModel": "qwen2.5-coder:7b", "ContextLength": 32768 },
+  { "Id": "gallery-python-review", "Name": "Python - read-only review", "Description": "Local review of typing, error handling and test coverage. Pair it with the Read-Only permission profile.",
+    "AgentProviderId": "codex", "AgentMode": "LocalProvider", "RuntimeId": "ollama", "Endpoint": "http://127.0.0.1:11434", "PrimaryModel": "qwen3:14b", "UtilityModel": null, "ContextLength": 32768 }
+]

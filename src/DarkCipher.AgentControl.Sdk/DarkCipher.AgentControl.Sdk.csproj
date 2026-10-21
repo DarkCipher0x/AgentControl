@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Public extension SDK. Semantic versioning; MUST NOT reference any other DarkCipher.AgentControl assembly. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Version>1.1.0</Version>
+    <PackageId>DarkCipher.AgentControl.Sdk</PackageId>
+    <Description>Capability-based extension SDK for DarkCipher AgentControl.</Description>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+</Project>
